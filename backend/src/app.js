@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import healthRoutes from './routes/health.routes.js';
 import userRoutes from './routes/user.routes.js';
+import subjectRoutes from './routes/subject.routes.js';
+import topicRoutes from './routes/topic.routes.js';
 import errorHandler from './middlewares/error.middleware.js';
 
 dotenv.config();
@@ -16,6 +18,8 @@ app.use(express.json());
 // Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/topics', topicRoutes);
 
 // Route Placeholder for development
 app.get('/', (req, res) => {
