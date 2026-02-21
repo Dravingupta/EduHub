@@ -97,21 +97,62 @@ const AssignmentView = () => {
                 )}
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-                    {assignment.questions.map((q, i) => (
-                        <div key={q.question_id} style={{ padding: "1.5rem", background: "#1E1E1E", borderRadius: "8px", border: "1px solid #333" }}>
-                            <h4 style={{ color: "#F5F5F5", marginBottom: "1rem", lineHeight: "1.5" }}>{i + 1}. {q.question}</h4>
+                    {(evaluation ? evaluation.results : assignment.questions).map((q, i) => (
+                        <div
+                            key={q.question_id}
+                            style={{
+                                padding: "1.5rem",
+                                background: "#1E1E1E",
+                                borderRadius: "8px",
+                                border: evaluation ? (q.is_correct ? "1px solid rgba(72, 187, 120, 0.5)" : "1px solid rgba(245, 101, 101, 0.5)") : "1px solid #333"
+                            }}
+                        >
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
+                                <h4 style={{ color: "#F5F5F5", lineHeight: "1.5", margin: 0 }}>{i + 1}. {q.question}</h4>
+                                {evaluation && (
+                                    <span style={{
+                                        padding: "0.25rem 0.5rem", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "bold",
+                                        background: q.is_correct ? "rgba(72, 187, 120, 0.2)" : "rgba(245, 101, 101, 0.2)",
+                                        color: q.is_correct ? "#48BB78" : "#FC8181"
+                                    }}>
+                                        {q.is_correct ? "Correct" : "Incorrect"}
+                                    </span>
+                                )}
+                            </div>
+
                             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                                 {q.options.map((opt, optIndex) => {
                                     const isSelected = answers[q.question_id] === opt;
+                                    let bg = "#262626";
+                                    let borderColor = "#333";
+                                    let color = "#A1A1AA";
+
+                                    if (evaluation) {
+                                        const isCorrectOpt = q.correct_answer === opt;
+                                        if (isCorrectOpt) {
+                                            bg = "rgba(72, 187, 120, 0.15)";
+                                            borderColor = "#48BB78";
+                                            color = "#48BB78";
+                                        } else if (isSelected && !isCorrectOpt) {
+                                            bg = "rgba(245, 101, 101, 0.15)";
+                                            borderColor = "#F56565";
+                                            color = "#F56565";
+                                        }
+                                    } else if (isSelected) {
+                                        bg = "rgba(200, 162, 76, 0.15)";
+                                        borderColor = "#C8A24C";
+                                        color = "#C8A24C";
+                                    }
+
                                     return (
                                         <label
                                             key={optIndex}
                                             style={{
                                                 display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem",
-                                                background: isSelected ? "rgba(200, 162, 76, 0.15)" : "#262626",
-                                                border: `1px solid ${isSelected ? "#C8A24C" : "#333"}`,
+                                                background: bg,
+                                                border: `1px solid ${borderColor}`,
                                                 borderRadius: "4px", cursor: evaluation ? "default" : "pointer",
-                                                color: isSelected ? "#C8A24C" : "#A1A1AA", transition: "all 0.2s"
+                                                color: color, transition: "all 0.2s"
                                             }}
                                         >
                                             <input
@@ -121,13 +162,20 @@ const AssignmentView = () => {
                                                 checked={isSelected}
                                                 onChange={() => handleOptionSelect(q.question_id, opt)}
                                                 disabled={!!evaluation}
-                                                style={{ cursor: evaluation ? "default" : "pointer", accentColor: "#C8A24C" }}
+                                                style={{ cursor: evaluation ? "default" : "pointer", accentColor: evaluation ? "transparent" : "#C8A24C" }}
                                             />
                                             <span style={{ lineHeight: "1.4" }}>{opt}</span>
                                         </label>
                                     );
                                 })}
                             </div>
+
+                            {evaluation && (
+                                <div style={{ marginTop: "1rem", padding: "1rem", background: "rgba(200, 162, 76, 0.05)", borderRadius: "6px", borderLeft: "4px solid #C8A24C" }}>
+                                    <h5 style={{ color: "#C8A24C", marginBottom: "0.5rem", fontSize: "0.875rem" }}>Explanation:</h5>
+                                    <p style={{ color: "#A1A1AA", lineHeight: "1.5", fontSize: "0.9rem" }}>{q.explanation}</p>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

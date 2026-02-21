@@ -40,6 +40,11 @@ const questionSchema = new Schema(
                 message: "The correct_answer must be one of the provided options.",
             },
         },
+        explanation: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         difficulty: {
             type: String,
             required: true,

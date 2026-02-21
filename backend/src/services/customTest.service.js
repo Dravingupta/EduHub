@@ -26,7 +26,7 @@ function validateTestSetFormat(parsedJson) {
     let hardCount = 0;
 
     for (const q of parsedJson.questions) {
-        if (!q.question || !q.options || !q.correct_answer || !q.difficulty || !q.concept_tag) {
+        if (!q.question || !q.options || !q.correct_answer || !q.difficulty || !q.concept_tag || !q.explanation) {
             return false;
         }
         if (!Array.isArray(q.options) || q.options.length < 4) return false;
@@ -75,13 +75,13 @@ Generate 10 MCQs for topic: "${topicName}"
 
 Rules:
 Strict JSON only
-No explanations
 Return an object containing an array named "questions"
 
 Each question must contain:
 - "question" (string)
 - "options" (array of 4 strings)
 - "correct_answer" (string, must exactly match one of the options)
+- "explanation" (string, 1-2 concise sentences explaining why the correct_answer is right, as a teaching moment)
 - "difficulty" ("easy" | "medium" | "hard")
 - "concept_tag" (string, short sub-topic)
 
@@ -97,6 +97,7 @@ Return format:
       "question": "",
       "options": [],
       "correct_answer": "",
+      "explanation": "",
       "difficulty": "",
       "concept_tag": ""
     }
@@ -120,10 +121,10 @@ JSON only.`;
                 validTestSet = result;
                 break; // Success
             } else {
-                console.warn(`[CustomTestService] Attempt ${attempt} failed validation constraints. Retrying...`);
+                console.warn(`[CustomTestService] Attempt ${attempt} failed validation constraints.Retrying...`);
             }
         } catch (error) {
-            console.error(`[CustomTestService] Attempt ${attempt} LLM error: ${error.message}`);
+            console.error(`[CustomTestService] Attempt ${attempt} LLM error: ${error.message} `);
         }
     }
 
@@ -132,12 +133,12 @@ JSON only.`;
     }
 
     // Step 4: Store Test
-    console.log(`[CustomTestService] JSON validated. Storing custom test set...`);
+    console.log(`[CustomTestService] JSON validated.Storing custom test set...`);
 
     // Clean names to be URL/ID safe
     const safeSubName = subjectName.replace(/\s+/g, "");
     const safeTopName = topicName.replace(/\s+/g, "");
-    const uniqueId = `custom_${safeSubName}_${safeTopName}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const uniqueId = `custom_${safeSubName}_${safeTopName}_${Date.now()}_${crypto.randomBytes(4).toString('hex')} `;
 
     const storedTest = await testBankRepository.createTestSet({
         subject_name: subjectName,

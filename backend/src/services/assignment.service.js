@@ -105,6 +105,28 @@ export const submitAssignment = async (assignmentId, userAnswers, timeTaken) => 
 
     const evaluation = evaluateAssignment(assignment);
 
+    // Fetch original test set to provide a detailed breakdown of correct/incorrect answers
+    const testSet = await testBankRepository.getTestSetById(assignment.test_set_id);
+    if (testSet && testSet.questions) {
+        evaluation.results = assignment.questions.map(q => {
+            // We use the question_id index (e.g., 'q_0') to map back to the original test bank
+            const qIndex = parseInt(q.question_id.replace('q_', ''));
+            const fullQuestion = testSet.questions[qIndex];
+            const userAnswer = userAnswers.find(ua => ua.question_id === q.question_id)?.selected_answer;
+
+            return {
+                question_id: q.question_id,
+                question: fullQuestion ? fullQuestion.question : "Question text unavailable",
+                options: fullQuestion ? fullQuestion.options : [],
+                selected_answer: userAnswer || null,
+                correct_answer: q.correct_answer,
+                explanation: (fullQuestion && fullQuestion.explanation) ? fullQuestion.explanation : "Explanation unavailable (older test bank version).",
+                is_correct: userAnswer === q.correct_answer,
+                difficulty: q.difficulty
+            };
+        });
+    }
+
     await assignmentRepository.updateAssignment(assignmentId, {
         user_answers: userAnswers,
         score: evaluation.score,
