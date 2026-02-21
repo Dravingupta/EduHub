@@ -140,7 +140,7 @@ export const submitAssignment = async (assignmentId, userAnswers, timeTaken) => 
         evaluation.mastery_score
     );
 
-    if (evaluation.mastery_score >= 60) {
+    if (evaluation.mastery_score >= 65) {
         await topicService.markTopicCompleted(assignment.topic_id);
         await streakService.recordDailyActivity(assignment.user_id, {
             studyTime: timeTaken,

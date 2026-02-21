@@ -88,7 +88,7 @@ const AssignmentView = () => {
                         <h3 style={{ color: "#C8A24C", marginBottom: "0.5rem" }}>Evaluation Complete!</h3>
                         <p style={{ color: "#F5F5F5", fontSize: "1.2rem", fontWeight: "bold" }}>Score: {evaluation.score}%</p>
                         <p style={{ color: "#F5F5F5", fontSize: "1.2rem", fontWeight: "bold" }}>Mastery: {evaluation.mastery_score}%</p>
-                        <p style={{ color: "#A1A1AA", marginTop: "1rem" }}>{evaluation.mastery_score >= 60 ? "Topic Mastered! You can move to the next." : "Keep studying, you need 60% mastery."}</p>
+                        <p style={{ color: "#A1A1AA", marginTop: "1rem" }}>{evaluation.mastery_score >= 65 ? "Topic Mastered! You can move to the next." : "Keep studying, you need 65% mastery."}</p>
                     </div>
                 ) : (
                     <p style={{ color: "#A1A1AA", marginBottom: "2rem" }}>

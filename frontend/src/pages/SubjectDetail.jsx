@@ -102,14 +102,13 @@ const SubjectDetailPlaceholder = () => {
                     <h3 className="text-lg font-semibold mb-4 text-white/90">Curriculum Path</h3>
 
                     {topics.sort((a, b) => a.order_index - b.order_index).map((topic, index) => {
-                        const isNextTopic = index === completedTopicsCount; // The immediate next uncompleted topic
-                        const isLocked = index > completedTopicsCount; // Topics further ahead
+                        const isLocked = false; // All topics are unlocked now
 
                         return (
                             <div
                                 key={topic._id || index}
                                 onClick={() => {
-                                    if (!isLocked) {
+                                    if (!topic.completed) {
                                         navigate(`/dashboard/subject/${subjectId}/topic/${topic._id}/lesson`);
                                     }
                                 }}
@@ -117,9 +116,7 @@ const SubjectDetailPlaceholder = () => {
                                     flex items-center justify-between p-5 rounded-xl border transition-all duration-200
                                     ${topic.completed
                                         ? "bg-surface/50 border-border opacity-70"
-                                        : isNextTopic
-                                            ? "bg-[#1E1E1E] border-accent/50 shadow-[0_0_15px_rgba(200,162,76,0.1)] cursor-pointer hover:border-accent hover:-translate-y-0.5"
-                                            : "bg-[#161616] border-[#222] opacity-40 cursor-not-allowed"
+                                        : "bg-[#1E1E1E] border-accent/50 shadow-[0_0_15px_rgba(200,162,76,0.1)] cursor-pointer hover:border-accent hover:-translate-y-0.5"
                                     }
                                 `}
                             >
@@ -127,7 +124,7 @@ const SubjectDetailPlaceholder = () => {
                                     {/* Number / Status Icon */}
                                     <div className={`
                                         w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0
-                                        ${topic.completed ? "bg-green-500/10 text-green-500" : isNextTopic ? "bg-accent/20 text-accent" : "bg-white/5 text-textSecondary"}
+                                        ${topic.completed ? "bg-green-500/10 text-green-500" : "bg-accent/20 text-accent"}
                                     `}>
                                         {topic.completed ? "✓" : (index + 1)}
                                     </div>
@@ -148,7 +145,7 @@ const SubjectDetailPlaceholder = () => {
                                         <span className="text-xs font-semibold text-green-500 px-3 py-1 bg-green-500/10 rounded-full">
                                             Mastered
                                         </span>
-                                    ) : isNextTopic ? (
+                                    ) : (
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation(); // prevent triggering parent div click
@@ -158,10 +155,6 @@ const SubjectDetailPlaceholder = () => {
                                         >
                                             Start Lesson
                                         </button>
-                                    ) : (
-                                        <span className="text-xs text-textSecondary px-3 py-1 bg-white/5 rounded-full border border-white/5">
-                                            Locked
-                                        </span>
                                     )}
                                 </div>
                             </div>
