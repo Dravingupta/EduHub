@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
+
+// Routes
 import healthRoutes from './routes/health.routes.js';
 import userRoutes from './routes/user.routes.js';
 import subjectRoutes from './routes/subject.routes.js';
@@ -10,15 +15,30 @@ import analyticsRoutes from './routes/analytics.routes.js';
 import streakRoutes from './routes/streak.routes.js';
 import readinessRoutes from './routes/readiness.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+
+// Middlewares
 import errorHandler from './middlewares/error.middleware.js';
+import rateLimiter from './middlewares/rateLimit.middleware.js';
+import requestLogger from './middlewares/requestLogger.middleware.js';
 
 dotenv.config();
 
 const app = express();
 
-// Middleware
+// Security middleware
+app.use(helmet());
+app.use(mongoSanitize());
+app.use(xss());
+
+// Body parser
+app.use(express.json({ limit: '10mb' }));
 app.use(cors());
-app.use(express.json());
+
+// Rate limiting (all /api routes)
+app.use('/api', rateLimiter);
+
+// Request logger + response time monitor
+app.use(requestLogger);
 
 // Routes
 app.use('/api/health', healthRoutes);

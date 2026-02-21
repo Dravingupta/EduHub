@@ -1,4 +1,5 @@
 import * as subjectRepository from '../repositories/subject.repository.js';
+import { WEAK_TOPIC_THRESHOLD, STRONG_TOPIC_THRESHOLD } from '../config/constants.js';
 
 export const createSubjectForUser = async (userId, subjectName, type = 'custom') => {
     const existing = await subjectRepository.findByUserAndName(userId, subjectName);
@@ -28,10 +29,10 @@ export const updateTopicMastery = async (subjectId, topic, masteryScore) => {
     const weakTopics = new Set(subject.weak_topics);
     const strongTopics = new Set(subject.strong_topics);
 
-    if (masteryScore < 60) {
+    if (masteryScore < WEAK_TOPIC_THRESHOLD) {
         weakTopics.add(topic);
         strongTopics.delete(topic);
-    } else if (masteryScore > 80) {
+    } else if (masteryScore > STRONG_TOPIC_THRESHOLD) {
         strongTopics.add(topic);
         weakTopics.delete(topic);
     } else {

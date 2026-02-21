@@ -12,10 +12,11 @@ import * as activityRepository from '../repositories/activity.repository.js';
 import * as subjectRepository from '../repositories/subject.repository.js';
 import * as streakService from './streak.service.js';
 import * as readinessService from './readiness.service.js';
-
-const INACTIVITY_THRESHOLD_HOURS = 48;
-const WEAK_TOPIC_THRESHOLD = 3;
-const READINESS_WARNING_THRESHOLD = 50;
+import {
+    INACTIVITY_HOURS,
+    WEAK_TOPIC_ALERT_THRESHOLD,
+    READINESS_WARNING_THRESHOLD,
+} from '../config/constants.js';
 
 const createIfNotDuplicate = async (userId, type, notificationData) => {
     const existing = await notificationRepository.findRecentByType(userId, type);
@@ -46,7 +47,7 @@ export const checkInactivityReminder = async (userId) => {
     const now = new Date();
     const hoursSinceActivity = (now.getTime() - lastActivityDate.getTime()) / (1000 * 60 * 60);
 
-    if (hoursSinceActivity > INACTIVITY_THRESHOLD_HOURS) {
+    if (hoursSinceActivity > INACTIVITY_HOURS) {
         return await createIfNotDuplicate(userId, 'inactivity_alert', {
             title: 'Study Inactivity',
             message: 'You haven\'t studied in the last 2 days. Continue learning to maintain your streak.',
@@ -70,7 +71,7 @@ export const checkWeakTopicReminder = async (userId) => {
         }
     }
 
-    if (allWeakTopics.length >= WEAK_TOPIC_THRESHOLD) {
+    if (allWeakTopics.length >= WEAK_TOPIC_ALERT_THRESHOLD) {
         return await createIfNotDuplicate(userId, 'weak_topic_alert', {
             title: 'Weak Topics Alert',
             message: `You have ${allWeakTopics.length} weak topics. Consider revising them.`,

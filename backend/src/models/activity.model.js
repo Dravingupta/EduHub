@@ -31,6 +31,7 @@ const activitySchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Ensures one activity record per user per day — optimizes daily activity lookups
 activitySchema.index({ user_id: 1, date: 1 }, { unique: true });
 
 const Activity = mongoose.model('Activity', activitySchema);

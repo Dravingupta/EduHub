@@ -2,8 +2,8 @@ import * as subjectRepository from '../repositories/subject.repository.js';
 import * as topicRepository from '../repositories/topic.repository.js';
 import * as assignmentRepository from '../repositories/assignment.repository.js';
 import * as streakService from './streak.service.js';
+import { EXPECTED_TIME_PER_QUESTION } from '../config/constants.js';
 
-const EXPECTED_TIME_PER_QUESTION = 45;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 

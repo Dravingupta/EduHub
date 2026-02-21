@@ -59,6 +59,7 @@ const subjectSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Prevents duplicate subjects per user — ensures unique subject_name per user_id
 subjectSchema.index({ user_id: 1, subject_name: 1 }, { unique: true });
 
 const Subject = mongoose.model('Subject', subjectSchema);
