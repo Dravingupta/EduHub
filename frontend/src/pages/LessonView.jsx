@@ -11,6 +11,11 @@ const LessonView = () => {
     const [error, setError] = useState(null);
     const [currentVisibleIndex, setCurrentVisibleIndex] = useState(0);
 
+    // Tuning State
+    const [showTuner, setShowTuner] = useState(false);
+    const [density, setDensity] = useState(50);
+    const [tuning, setTuning] = useState(false);
+
     // Mock Fetching for now - Will connect to exact LLM generation route next
     const fetchLesson = async (forceRegenerate = false) => {
         setLoading(true);
@@ -28,6 +33,23 @@ const LessonView = () => {
             console.error(err);
             setError("Failed to load lesson.");
             setLoading(false);
+        }
+    };
+
+    const handleApplyTuning = async () => {
+        setTuning(true);
+        try {
+            // Update the subject's density preference in the backend
+            await api.patch(`/subjects/${subjectId}/density`, { density });
+            // Then instantly trigger a full LLM regeneration bypassing the cache
+            await fetchLesson(true);
+            setShowTuner(false);
+            setDensity(50); // Reset UI slider back to balanced for the next tune
+        } catch (err) {
+            console.error(err);
+            alert("Failed to update density tuning.");
+        } finally {
+            setTuning(false);
         }
     };
 
@@ -120,14 +142,49 @@ const LessonView = () => {
 
             {/* User Interaction / Paging Zone */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.5rem", background: "#161616", borderRadius: "8px", border: "1px solid #262626" }}>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, paddingRight: "2rem" }}>
                     <p style={{ color: "#A1A1AA", fontSize: "0.875rem", marginBottom: "0.5rem" }}>Is this explanation working for you?</p>
-                    <button
-                        style={{ background: "transparent", color: "#C8A24C", border: "1px solid rgba(200, 162, 76, 0.5)", padding: "0.5rem 1rem", borderRadius: "4px", fontSize: "0.875rem", cursor: "pointer" }}
-                        onClick={() => fetchLesson(true)}
-                    >
-                        🔄 Tune Explanation Density
-                    </button>
+
+                    {!showTuner ? (
+                        <button
+                            style={{ background: "transparent", color: "#C8A24C", border: "1px solid rgba(200, 162, 76, 0.5)", padding: "0.5rem 1rem", borderRadius: "4px", fontSize: "0.875rem", cursor: "pointer" }}
+                            onClick={() => setShowTuner(true)}
+                        >
+                            🔄 Tune Explanation Density
+                        </button>
+                    ) : (
+                        <div style={{ background: "#262626", padding: "1rem", borderRadius: "8px", marginTop: "0.5rem" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.75rem", color: "#A1A1AA" }}>
+                                <span>Concise</span>
+                                <span>Balanced</span>
+                                <span>Detailed</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={density}
+                                onChange={(e) => setDensity(Number(e.target.value))}
+                                style={{ width: "100%", accentColor: "#C8A24C", marginBottom: "1rem" }}
+                            />
+                            <div style={{ display: "flex", gap: "0.5rem" }}>
+                                <button
+                                    onClick={handleApplyTuning}
+                                    disabled={tuning}
+                                    style={{ background: "#C8A24C", color: "#000", border: "none", padding: "0.5rem 1rem", borderRadius: "4px", fontSize: "0.875rem", fontWeight: "bold", cursor: tuning ? "not-allowed" : "pointer", flex: 1 }}
+                                >
+                                    {tuning ? "Regenerating..." : "Apply & Swap Lesson"}
+                                </button>
+                                <button
+                                    onClick={() => setShowTuner(false)}
+                                    disabled={tuning}
+                                    style={{ background: "transparent", color: "#A1A1AA", border: "1px solid #555", padding: "0.5rem 1rem", borderRadius: "4px", fontSize: "0.875rem", cursor: tuning ? "not-allowed" : "pointer" }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div>
                     <button
