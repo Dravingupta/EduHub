@@ -3,6 +3,7 @@ import { evaluateAssignment } from './evaluation.service.js';
 import * as subjectService from './subject.service.js';
 import * as topicService from './topic.service.js';
 import * as userService from './user.service.js';
+import * as streakService from './streak.service.js';
 
 export const submitAssignment = async (assignmentId, userAnswers, timeTaken) => {
     const assignment = await assignmentRepository.findById(assignmentId);
@@ -30,11 +31,18 @@ export const submitAssignment = async (assignmentId, userAnswers, timeTaken) => 
 
     if (evaluation.mastery_score >= 60) {
         await topicService.markTopicCompleted(assignment.topic_id);
+        await streakService.recordDailyActivity(assignment.user_id, {
+            studyTime: timeTaken,
+            assignments: 1,
+            topics: 1,
+        });
     } else {
-        const user = await assignmentRepository.findById(assignmentId);
-        if (user) {
-            await userService.incrementRetry(assignment.user_id);
-        }
+        await userService.incrementRetry(assignment.user_id);
+        await streakService.recordDailyActivity(assignment.user_id, {
+            studyTime: timeTaken,
+            assignments: 1,
+            topics: 0,
+        });
     }
 
     return evaluation;
