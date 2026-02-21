@@ -99,6 +99,8 @@ Each block object must strictly contain:
 - "content": (string, object, or array depending on what best represents the block)
 - "metadata": (optional object for extra contextual data)
 
+For "diagram" type blocks: the "content" field MUST contain ONLY valid Mermaid.js syntax (e.g. graph TD, graph LR, sequenceDiagram, mindmap). Do NOT wrap in code fences. Use simple node labels. Always include at least 1 diagram block.
+
 Output ONLY the JSON array.
 `;
 

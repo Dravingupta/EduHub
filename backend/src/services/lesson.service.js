@@ -74,11 +74,11 @@ Follow this strict schema:
 BLOCK TYPE RULES:
 - "concept": Standard explanation cards.
 - "example": Concrete analogies, code snippets, or mathematical step-by-step applications.
-- "diagram": Text-based visualizations or lists.
+- "diagram": Visual diagram block. The 'content' field MUST contain ONLY valid Mermaid.js syntax code (e.g. graph TD, graph LR, sequenceDiagram, mindmap). Do NOT wrap in code fences. Use simple node labels (no special characters or parentheses in labels — use square brackets like A["Label"] if needed). Always include at least 1–2 diagram blocks per lesson to visualize concept relationships, process flows, or hierarchies.
 - "mistakes": Common pitfalls or student misconceptions.
 - "summary": The final wrap-up before an assignment.
 
-Ensure the "blocks" array logically flows progressively. Keep it engaging. Output ONLY VALID JSON.`;
+Ensure the "blocks" array logically flows progressively. Keep it engaging. Include at least one diagram block to help visualize key concepts. Output ONLY VALID JSON.`;
 
     // 5. Call LLM
     console.log(`[LessonService] Generating new lesson for Topic: ${topic.topic_name} | Density: ${density} | Difficulty: ${difficulty}`);

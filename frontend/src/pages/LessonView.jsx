@@ -1,8 +1,70 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "katex/dist/katex.min.css";
 import { InlineMath, BlockMath } from "react-katex";
+import mermaid from "mermaid";
+
+/* ─── Mermaid initialization (dark theme) ─── */
+mermaid.initialize({
+    startOnLoad: false,
+    theme: "dark",
+    themeVariables: {
+        primaryColor: "#2A2A3E",
+        primaryTextColor: "#F5F5F5",
+        primaryBorderColor: "#C8A24C",
+        lineColor: "#C8A24C",
+        secondaryColor: "#1E1E2E",
+        tertiaryColor: "#161622",
+        fontFamily: "inherit",
+        fontSize: "14px",
+    },
+    securityLevel: "loose",
+    flowchart: { curve: "basis", padding: 16 },
+});
+
+/* ─── Mermaid diagram renderer ─── */
+const MermaidDiagram = ({ chart }) => {
+    const containerRef = useRef(null);
+    const [error, setError] = useState(false);
+
+    const renderChart = useCallback(async () => {
+        if (!containerRef.current || !chart) return;
+        try {
+            // Clean the chart string
+            let cleanChart = chart.trim();
+            // Remove code fences if LLM wrapped them
+            cleanChart = cleanChart.replace(/^```mermaid\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "");
+
+            const id = `mermaid-${Math.random().toString(36).substring(2, 10)}`;
+            const { svg } = await mermaid.render(id, cleanChart);
+            containerRef.current.innerHTML = svg;
+            setError(false);
+        } catch (err) {
+            console.error("Mermaid render error:", err);
+            setError(true);
+        }
+    }, [chart]);
+
+    useEffect(() => {
+        renderChart();
+    }, [renderChart]);
+
+    if (error) {
+        return (
+            <div className="bg-[#1A1A2E] border border-[#333] rounded-xl p-4">
+                <pre className="text-xs text-textSecondary overflow-x-auto whitespace-pre-wrap">{chart}</pre>
+            </div>
+        );
+    }
+
+    return (
+        <div
+            ref={containerRef}
+            className="flex justify-center py-4 [&_svg]:max-w-full [&_svg]:h-auto"
+        />
+    );
+};
 
 /* ─── LaTeX-aware text renderer ─── */
 const RenderMath = ({ text }) => {
@@ -357,6 +419,22 @@ const LessonView = () => {
                                 </div>
                                 <div className="mt-4">
                                     <RenderContent content={block.content} />
+                                </div>
+                            </div>
+                        </div>
+                    );
+
+                case "diagram":
+                    return (
+                        <div className={`lesson-block relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#131320] to-[#141418] border border-indigo-500/15 ${isLatest ? "lesson-block-enter" : ""}`}>
+                            <div className="h-1 bg-gradient-to-r from-indigo-500/60 via-purple-500/40 to-transparent" />
+                            <div className="p-6 md:p-8">
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg">📊</div>
+                                    <h3 className="text-xl font-bold text-indigo-300 tracking-tight">{block.title}</h3>
+                                </div>
+                                <div className="mt-4 bg-[#0E0E1A] border border-[#222] rounded-xl p-4 overflow-x-auto">
+                                    <MermaidDiagram chart={typeof block.content === "string" ? block.content : JSON.stringify(block.content)} />
                                 </div>
                             </div>
                         </div>
