@@ -5,6 +5,7 @@ import healthRoutes from './routes/health.routes.js';
 import userRoutes from './routes/user.routes.js';
 import subjectRoutes from './routes/subject.routes.js';
 import topicRoutes from './routes/topic.routes.js';
+import assignmentRoutes from './routes/assignment.routes.js';
 import errorHandler from './middlewares/error.middleware.js';
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/topics', topicRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 // Route Placeholder for development
 app.get('/', (req, res) => {
