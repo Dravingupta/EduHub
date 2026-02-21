@@ -25,10 +25,13 @@ export const createAssignment = async ({
     lessonId
 }) => {
     // Step 1: Fetch all test sets for the topic
-    const availableTestSets = await testBankRepository.getTestSetsByTopic(subjectName, topicName);
+    let availableTestSets = await testBankRepository.getTestSetsByTopic(subjectName, topicName);
 
     if (!availableTestSets || availableTestSets.length === 0) {
-        throw new Error(`[AssignmentService] No test sets found in TestBank for Topic: ${topicName} inside Subject: ${subjectName}. Please run the TestBank generator script first.`);
+        console.log(`[AssignmentService] No test sets found. Auto-generating test via LLM for Topic: ${topicName}`);
+        const { generateCustomTestIfNotExists } = await import('./customTest.service.js');
+        const generatedTest = await generateCustomTestIfNotExists({ subjectName, topicName });
+        availableTestSets = [generatedTest];
     }
 
     // Step 2: Fetch User's previous assignments to find used ones

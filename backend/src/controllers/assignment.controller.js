@@ -1,8 +1,49 @@
 import mongoose from 'mongoose';
 import * as assignmentService from '../services/assignment.service.js';
+import * as userService from '../services/user.service.js';
+import * as topicRepository from '../repositories/topic.repository.js';
+import * as subjectRepository from '../repositories/subject.repository.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+export const startAssignment = async (req, res, next) => {
+    try {
+        const { topicId } = req.body;
+        const { uid } = req.user;
+
+        if (!topicId || !isValidObjectId(topicId)) {
+            return errorResponse(res, 'Invalid topicId', 400);
+        }
+
+        const user = await userService.getOrCreateUser(uid);
+        if (!user) {
+            return errorResponse(res, 'User not found', 404);
+        }
+
+        const topic = await topicRepository.findById(topicId);
+        if (!topic) {
+            return errorResponse(res, 'Topic not found', 404);
+        }
+
+        const subject = await subjectRepository.findById(topic.subject_id);
+        if (!subject) {
+            return errorResponse(res, 'Subject not found', 404);
+        }
+
+        const assignment = await assignmentService.createAssignment({
+            userId: user._id,
+            subjectName: subject.subject_name,
+            subjectId: subject._id,
+            topicName: topic.topic_name,
+            topicId: topic._id,
+        });
+
+        return successResponse(res, assignment, 'Assignment generated successfully');
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const submitAssignment = async (req, res, next) => {
     try {

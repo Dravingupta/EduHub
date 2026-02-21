@@ -70,30 +70,46 @@ class GeminiService { // Kept name GeminiService for compatibility with import u
             throw new Error(`[MegaLLMService:${label}] Prompt must be a non-empty string.`);
         }
 
-        try {
-            console.log(`[MegaLLMService:${label}] Generating…`);
+        const MAX_RETRIES = 3;
+        let delayMs = 1500;
+        let lastError;
 
-            const response = await this.#client.chat.completions.create({
-                model: MODEL,
-                messages: [
-                    { role: 'system', content: PROMPTS.system("") },
-                    { role: 'user', content: prompt }
-                ]
-            });
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                console.log(`[MegaLLMService:${label}] Generating… (Attempt ${attempt}/${MAX_RETRIES})`);
 
-            const content = response.choices[0]?.message?.content?.trim();
+                const response = await this.#client.chat.completions.create({
+                    model: MODEL,
+                    response_format: { type: "json_object" },
+                    messages: [
+                        { role: 'system', content: PROMPTS.system("") },
+                        { role: 'user', content: prompt }
+                    ]
+                });
 
-            if (!content) {
-                throw new Error("Empty response received from MegaLLM.");
+                const content = response.choices[0]?.message?.content?.trim();
+
+                if (!content) {
+                    throw new Error("Empty response received from MegaLLM.");
+                }
+
+                const parsed = parseJSON(content);
+                console.log(`[MegaLLMService:${label}] Success ✓`);
+                return parsed;
+            } catch (error) {
+                lastError = error;
+                console.warn(`[MegaLLMService:${label}] Attempt ${attempt} failed: ${error.message}`);
+
+                if (attempt < MAX_RETRIES) {
+                    console.log(`[MegaLLMService:${label}] Waiting ${delayMs}ms before retrying...`);
+                    await new Promise((resolve) => setTimeout(resolve, delayMs));
+                    delayMs *= 2; // exponential backoff
+                }
             }
-
-            const parsed = parseJSON(content);
-            console.log(`[MegaLLMService:${label}] Success ✓`);
-            return parsed;
-        } catch (error) {
-            console.error(`[MegaLLMService:${label}] Failed:`, error.message);
-            throw new Error(`[MegaLLMService:${label}] ${error.message}`);
         }
+
+        console.error(`[MegaLLMService:${label}] All ${MAX_RETRIES} attempts failed.`);
+        throw new Error(`[MegaLLMService:${label}] ${lastError?.message || "Unknown error"}`);
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
