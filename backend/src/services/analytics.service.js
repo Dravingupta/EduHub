@@ -34,9 +34,14 @@ export const getTopicMasteryBreakdown = async (subjectId) => {
         throw new Error('Subject not found');
     }
 
-    const breakdown = [];
+    const topics = await topicRepository.getOrderedTopics(subjectId);
+    const topicIdToNameMap = {};
+    for (const t of topics) {
+        topicIdToNameMap[t._id.toString()] = t.topic_name;
+    }
 
-    for (const [topicName, masteryScore] of subject.topic_mastery_map.entries()) {
+    const breakdown = [];
+    for (const [topicId, masteryScore] of subject.topic_mastery_map.entries()) {
         let status = 'average';
 
         if (masteryScore < 60) {
@@ -46,7 +51,7 @@ export const getTopicMasteryBreakdown = async (subjectId) => {
         }
 
         breakdown.push({
-            topic_name: topicName,
+            topic_name: topicIdToNameMap[topicId] || topicId,
             mastery_score: masteryScore,
             status,
         });
@@ -93,11 +98,17 @@ export const getWeakTopicsAcrossSubjects = async (userId) => {
     const weakTopics = [];
 
     for (const subject of subjects) {
-        for (const [topicName, masteryScore] of subject.topic_mastery_map.entries()) {
+        const topics = await topicRepository.getOrderedTopics(subject._id);
+        const topicIdToNameMap = {};
+        for (const t of topics) {
+            topicIdToNameMap[t._id.toString()] = t.topic_name;
+        }
+
+        for (const [topicId, masteryScore] of subject.topic_mastery_map.entries()) {
             if (masteryScore < 60) {
                 weakTopics.push({
                     subject_name: subject.subject_name,
-                    topic_name: topicName,
+                    topic_name: topicIdToNameMap[topicId] || topicId,
                     mastery_score: masteryScore,
                 });
             }

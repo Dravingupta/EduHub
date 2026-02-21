@@ -10,6 +10,7 @@ import LandingPage from './pages/LandingPage';
 import SubjectDetail from './pages/SubjectDetail';
 import LessonView from './pages/LessonView';
 import AssignmentView from './pages/AssignmentView';
+import AnalyticsOverview from './pages/AnalyticsOverview';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
       >
         {/* Nested Routes inside Dashboard's <Outlet /> */}
         <Route index element={<Subjects />} />
+        <Route path="analytics" element={<AnalyticsOverview />} />
         <Route path="create-subject" element={<CreateSubject />} />
         <Route path="subject/:subjectId" element={<SubjectDetail />} />
         <Route path="subject/:subjectId/topic/:topicId/lesson" element={<LessonView />} />

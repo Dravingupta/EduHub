@@ -27,8 +27,8 @@ const Dashboard = () => {
                     <Link to="/dashboard" style={navLinkStyle("/dashboard")}>
                         Subjects
                     </Link>
-                    <Link to="#" style={{ ...navLinkStyle("#"), opacity: 0.5, cursor: "not-allowed" }}>
-                        Courses (Coming Soon)
+                    <Link to="/dashboard/analytics" style={navLinkStyle("/dashboard/analytics")}>
+                        Data Analytics
                     </Link>
                     <Link to="#" style={{ ...navLinkStyle("#"), opacity: 0.5, cursor: "not-allowed" }}>
                         Settings (Coming Soon)
