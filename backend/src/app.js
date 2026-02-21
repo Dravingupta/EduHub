@@ -8,6 +8,8 @@ import topicRoutes from './routes/topic.routes.js';
 import assignmentRoutes from './routes/assignment.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import streakRoutes from './routes/streak.routes.js';
+import readinessRoutes from './routes/readiness.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 import errorHandler from './middlewares/error.middleware.js';
 
 dotenv.config();
@@ -26,6 +28,8 @@ app.use('/api/topics', topicRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/streak', streakRoutes);
+app.use('/api/readiness', readinessRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Route Placeholder for development
 app.get('/', (req, res) => {
