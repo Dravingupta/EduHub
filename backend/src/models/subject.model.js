@@ -55,6 +55,11 @@ const subjectSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+
+        target_days: {
+            type: Number,
+            default: 120, // default timeline
+        },
     },
     { timestamps: true }
 );

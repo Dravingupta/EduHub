@@ -9,11 +9,11 @@
  *   GEMINI_API_KEY=your-key
  */
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
-const MODEL = "gemini-pro";
+const MODEL = "gemini-3-flash-preview";
 const TIMEOUT_MS = 60_000;
 const DEFAULT_TEMPERATURE = 0.7;
 const DEFAULT_MAX_TOKENS = 4096;
@@ -69,14 +69,7 @@ class GeminiService {
             );
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        this.#model = genAI.getGenerativeModel({
-            model: MODEL,
-            generationConfig: {
-                temperature: DEFAULT_TEMPERATURE,
-                maxOutputTokens: DEFAULT_MAX_TOKENS,
-            },
-        });
+        this.#model = new GoogleGenAI({ apiKey });
 
         console.log(`[GeminiService] Initialized — model: ${MODEL}`);
     }
@@ -98,13 +91,16 @@ class GeminiService {
             console.log(`[GeminiService:${label}] Generating…`);
 
             const result = await Promise.race([
-                this.#model.generateContent(PROMPTS.system(prompt)),
+                this.#model.models.generateContent({
+                    model: MODEL,
+                    contents: PROMPTS.system(prompt),
+                }),
                 new Promise((_, reject) =>
                     setTimeout(() => reject(new Error("Request timed out")), TIMEOUT_MS)
                 ),
             ]);
 
-            const content = result.response?.text()?.trim();
+            const content = result.text?.trim();
 
             if (!content) {
                 throw new Error("Empty response received from Gemini.");

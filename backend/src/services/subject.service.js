@@ -1,7 +1,7 @@
 import * as subjectRepository from '../repositories/subject.repository.js';
 import { WEAK_TOPIC_THRESHOLD, STRONG_TOPIC_THRESHOLD } from '../config/constants.js';
 
-export const createSubjectForUser = async (userId, subjectName, type = 'custom') => {
+export const createSubjectForUser = async (userId, subjectName, type = 'custom', targetDays = 120) => {
     const existing = await subjectRepository.findByUserAndName(userId, subjectName);
 
     if (existing) {
@@ -12,6 +12,7 @@ export const createSubjectForUser = async (userId, subjectName, type = 'custom')
         user_id: userId,
         subject_name: subjectName,
         type,
+        target_days: targetDays
     });
 };
 

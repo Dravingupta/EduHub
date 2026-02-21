@@ -27,3 +27,34 @@ export const REQUIRED_ENV_VARS = [
     'MONGODB_URL',
     'FIREBASE_PROJECT_ID',
 ];
+
+export const UNIVERSAL_SUBJECTS = {
+    "Physics_JEE": [
+        "Kinematics",
+        "Laws of Motion",
+        "Magnetism"
+    ],
+    "Chemistry_JEE": [
+        "Atomic Structure",
+        "Thermodynamics"
+    ],
+    "Mathematics_JEE": [
+        "Calculus",
+        "Algebra",
+        "Coordinate Geometry"
+    ],
+    "Physics_NEET": [
+        "Kinematics",
+        "Laws of Motion",
+        "Optics"
+    ],
+    "Chemistry_NEET": [
+        "Atomic Structure",
+        "Thermodynamics"
+    ],
+    "Biology_NEET": [
+        "Human Physiology",
+        "Genetics",
+        "Cell Structure"
+    ]
+};

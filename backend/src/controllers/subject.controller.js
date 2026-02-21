@@ -1,6 +1,9 @@
 import * as subjectService from '../services/subject.service.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 import * as userService from '../services/user.service.js';
+import * as topicService from '../services/topic.service.js';
+import { createCustomSubject } from '../services/customSubject.service.js';
+import { UNIVERSAL_SUBJECTS } from '../config/constants.js';
 
 export const createSubject = async (req, res, next) => {
     try {
@@ -12,7 +15,38 @@ export const createSubject = async (req, res, next) => {
         }
 
         const user = await userService.getOrCreateUser(uid);
-        const subject = await subjectService.createSubjectForUser(user._id, subject_name, type);
+        let subject;
+
+        if (type === 'custom') {
+            const { syllabusText } = req.body;
+            if (!syllabusText || syllabusText.length < 50) {
+                return errorResponse(res, 'syllabusText is required and must be at least 50 characters for custom subjects', 400);
+            }
+
+            const targetDays = req.body.target_days ? parseInt(req.body.target_days, 10) : 120;
+
+            const customResult = await createCustomSubject({
+                userId: user._id,
+                subjectName: subject_name,
+                syllabusText: syllabusText,
+                targetDays: targetDays
+            });
+
+            subject = { _id: customResult.subject_id, subject_name, type: 'custom' };
+
+        } else {
+            subject = await subjectService.createSubjectForUser(user._id, subject_name, type, req.body.target_days);
+
+            if (type === 'universal') {
+                const universalTopics = UNIVERSAL_SUBJECTS[subject_name];
+                if (universalTopics) {
+                    const syllabus = {
+                        "Core Curriculum": universalTopics
+                    };
+                    await topicService.createTopicsFromSyllabus(subject._id, syllabus);
+                }
+            }
+        }
 
         return successResponse(res, { subject }, 'Subject created successfully', 201);
     } catch (error) {

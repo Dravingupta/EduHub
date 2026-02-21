@@ -96,8 +96,6 @@ const testBankSchema = new Schema(
 
 // Compound index for fetching a subject's topic test sets efficiently
 testBankSchema.index({ subject_name: 1, topic_name: 1 });
-// Individual index for lookups
-testBankSchema.index({ test_set_id: 1 });
 
 const TestBank = model("TestBank", testBankSchema);
 export default TestBank;

@@ -35,7 +35,8 @@ export const createCustomSubject = async ({
     courseName,
     year,
     subjectName,
-    syllabusText
+    syllabusText,
+    targetDays
 }) => {
     // Basic validation
     if (!syllabusText || syllabusText.length < 50) {
@@ -102,12 +103,10 @@ JSON only.`;
         user_id: userId,
         subject_name: subjectName,
         type: 'custom',
-        // Optional schema extensions that could be useful to log based on specs
-        // course_name: courseName,
-        // year: year,
         topic_mastery_map: {},
         explanation_density_preference: 50,
-        difficulty_preference: 'medium'
+        difficulty_preference: 'medium',
+        target_days: targetDays || 120
     };
 
     const newSubject = await subjectRepository.createSubject(subjectData);
