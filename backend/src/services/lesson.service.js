@@ -59,26 +59,26 @@ ADAPTIVE PREFERENCES:
 
 OUTPUT FORMAT REQUIREMENT:
 You must return your lesson exactly as a JSON object containing a "blocks" array.
-Each block must be a visual component with a specific "type", "title", and "content".
+Each block must be a component with a specific "type", "title", and "content".
 Follow this strict schema:
 {
   "blocks": [
     {
       "type": "Enum('concept', 'example', 'diagram', 'mistakes', 'summary')",
       "title": "Short descriptive title",
-      "content": "The actual text/markdown payload for this block"
+      "content": "The actual payload for this block"
     }
   ]
 }
 
 BLOCK TYPE RULES:
-- "concept": Standard explanation cards.
-- "example": Concrete analogies, code snippets, or mathematical step-by-step applications.
-- "diagram": Visual diagram block. The 'content' field MUST contain ONLY valid Mermaid.js syntax code (e.g. graph TD, graph LR, sequenceDiagram, mindmap). Do NOT wrap in code fences. Use simple node labels (no special characters or parentheses in labels — use square brackets like A["Label"] if needed). Always include at least 1–2 diagram blocks per lesson to visualize concept relationships, process flows, or hierarchies.
+- "concept": Standard explanation cards. Use proper Markdown and LaTeX ($ inline $, $$ block $$) for math formulas or matrices. Do NOT use Mermaid here.
+- "example": Concrete analogies, code snippets, or mathematical step-by-step applications. Use LaTeX for math.
+- "diagram": Visual diagram block. The 'content' field MUST contain ONLY valid Mermaid.js syntax code (e.g. flowchart TD, mindmap). Do NOT wrap in markdown code fences. Use simple node labels and NO mathematical brackets or special characters inside the mermaid graph.
 - "mistakes": Common pitfalls or student misconceptions.
 - "summary": The final wrap-up before an assignment.
 
-Ensure the "blocks" array logically flows progressively. Keep it engaging. Include at least one diagram block to help visualize key concepts. Output ONLY VALID JSON.`;
+Ensure the "blocks" array logically flows progressively. Keep it engaging. You MUST include exactly 2 "diagram" blocks somewhere in the lesson to visualize relationships, and leave complex math to the text blocks using LaTeX. Output ONLY VALID JSON.`;
 
     // 5. Call LLM
     console.log(`[LessonService] Generating new lesson for Topic: ${topic.topic_name} | Density: ${density} | Difficulty: ${difficulty}`);
