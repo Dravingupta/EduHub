@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 const ProgressBar = ({ value, max = 100, color = "#C8A24C", bg = "#262626", height = "8px" }) => (
@@ -8,6 +9,7 @@ const ProgressBar = ({ value, max = 100, color = "#C8A24C", bg = "#262626", heig
 );
 
 const AnalyticsOverview = () => {
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [weakTopics, setWeakTopics] = useState([]);
     const [subjects, setSubjects] = useState([]);
@@ -140,9 +142,33 @@ const AnalyticsOverview = () => {
                                 const avgColor = sub.avg_subject_mastery >= 80 ? "#48BB78" : (sub.avg_subject_mastery >= 60 ? "#ECC94B" : "#FC8181");
 
                                 return (
-                                    <div key={sub._id} style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #161616 100%)", border: "1px solid #262626", padding: "1.5rem", borderRadius: "12px" }}>
+                                    <div
+                                        key={sub._id}
+                                        onClick={() => navigate(`/dashboard/analytics/${sub._id}`)}
+                                        style={{
+                                            background: "linear-gradient(145deg, #1A1A1A 0%, #161616 100%)",
+                                            border: "1px solid #262626",
+                                            padding: "1.5rem",
+                                            borderRadius: "12px",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease"
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = "translateY(-2px)";
+                                            e.currentTarget.style.borderColor = "#404040";
+                                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.5)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = "none";
+                                            e.currentTarget.style.borderColor = "#262626";
+                                            e.currentTarget.style.boxShadow = "none";
+                                        }}
+                                    >
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                                            <div style={{ color: "#F5F5F5", fontWeight: "bold", fontSize: "1.1rem" }}>{sub.subject_name}</div>
+                                            <div style={{ color: "#F5F5F5", fontWeight: "bold", fontSize: "1.1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                                {sub.subject_name}
+                                                <span style={{ color: "#A1A1AA", fontSize: "0.875rem", fontWeight: "normal" }}>↗</span>
+                                            </div>
                                             <div style={{ fontSize: "1.125rem", color: avgColor, fontWeight: "bold" }}>
                                                 {sub.avg_subject_mastery}%
                                             </div>
