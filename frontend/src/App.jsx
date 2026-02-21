@@ -8,6 +8,8 @@ import MainLayout from './layout/MainLayout';
 import LandingPage from './pages/LandingPage';
 
 import SubjectDetail from './pages/SubjectDetail';
+import LessonView from './pages/LessonView';
+import AssignmentView from './pages/AssignmentView';
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
         <Route index element={<Subjects />} />
         <Route path="create-subject" element={<CreateSubject />} />
         <Route path="subject/:subjectId" element={<SubjectDetail />} />
+        <Route path="subject/:subjectId/topic/:topicId/lesson" element={<LessonView />} />
+        <Route path="subject/:subjectId/topic/:topicId/assignment" element={<AssignmentView />} />
       </Route>
 
       {/* Fallback */}

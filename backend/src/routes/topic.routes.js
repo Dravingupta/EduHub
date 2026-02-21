@@ -5,6 +5,7 @@ import {
     getTopics,
     completeTopic,
     deleteTopics,
+    generateLesson,
 } from '../controllers/topic.controller.js';
 
 const router = Router();
@@ -15,5 +16,6 @@ router.post('/syllabus', createSyllabus);
 router.get('/:subjectId', getTopics);
 router.patch('/:topicId/complete', completeTopic);
 router.delete('/:subjectId', deleteTopics);
+router.post('/:topicId/lesson', generateLesson);
 
 export default router;

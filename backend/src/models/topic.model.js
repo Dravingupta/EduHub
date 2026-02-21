@@ -23,6 +23,11 @@ const topicSchema = new mongoose.Schema(
             required: true,
         },
 
+        lesson_data: {
+            type: mongoose.Schema.Types.Mixed,
+            default: null,
+        },
+
         is_completed: {
             type: Boolean,
             default: false,

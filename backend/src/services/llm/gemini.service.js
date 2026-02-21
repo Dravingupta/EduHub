@@ -1,30 +1,21 @@
 /**
- * Gemini Service — Centralized LLM service powered by Google Gemini API.
- *
- * Single-provider design optimized for hackathon MVP speed and token efficiency.
- * Structured so a future provider can be swapped in by replacing this file
- * and keeping the same public API surface.
+ * MegaLLM Service — Centralized LLM service powered by MegaLLM (OpenAI SDK compatible).
  *
  * Env required:
- *   GEMINI_API_KEY=your-key
+ *   MEGALLM_API_KEY=your-key
  */
 
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from 'openai';
+
+// Force nodemon restart to load .env
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
-const MODEL = "gemini-3-flash-preview";
-const TIMEOUT_MS = 60_000;
-const DEFAULT_TEMPERATURE = 0.7;
-const DEFAULT_MAX_TOKENS = 4096;
+const MODEL = 'gemini-3-flash-preview';
 
 // ─── Prompt Templates ───────────────────────────────────────────────────────
 
 const PROMPTS = {
-    /**
-     * Wraps a raw user prompt with the system instruction.
-     * Keep this as a single place to tune the "persona" for all calls.
-     */
     system: (userPrompt) =>
         `You are an expert educational content generator.\n` +
         `RULES:\n` +
@@ -42,97 +33,83 @@ const PROMPTS = {
  */
 function parseJSON(raw) {
     let cleaned = raw.trim();
-    // Strip ```json ... ``` wrappers
     if (cleaned.startsWith("```")) {
         cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     }
     try {
         return JSON.parse(cleaned);
     } catch (err) {
-        console.error("[GeminiService] JSON parse failed. Raw output:\n", raw);
-        throw new Error(
-            `[GeminiService] LLM returned invalid JSON. Parse error: ${err.message}`
-        );
+        console.error("[MegaLLMService] JSON parse failed. Raw output:\n", raw);
+        throw new Error(`[MegaLLMService] LLM returned invalid JSON. Parse error: ${err.message}`);
     }
 }
 
 // ─── Service Class ──────────────────────────────────────────────────────────
 
-class GeminiService {
-    #model;
+class GeminiService { // Kept name GeminiService for compatibility with import usages
+    #client;
 
     constructor() {
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = process.env.MEGALLM_API_KEY;
         if (!apiKey) {
-            throw new Error(
-                "[GeminiService] GEMINI_API_KEY is missing. Add it to your .env file."
-            );
+            console.warn("[MegaLLMService] MEGALLM_API_KEY is missing. Add it to your .env file.");
         }
 
-        this.#model = new GoogleGenAI({ apiKey });
+        this.#client = new OpenAI({
+            baseURL: 'https://ai.megallm.io/v1',
+            apiKey: apiKey || 'missing-key'
+        });
 
-        console.log(`[GeminiService] Initialized — model: ${MODEL}`);
+        console.log(`[MegaLLMService] Initialized — model: ${MODEL}`);
     }
 
     // ── Internal ────────────────────────────────────────────────────────────
 
-    /**
-     * Core generation method. Sends prompt, enforces timeout, parses JSON.
-     * @param {string} prompt - Raw user prompt.
-     * @param {string} label  - Logging label (method name).
-     * @returns {Promise<object>} Parsed JSON object.
-     */
     async #generate(prompt, label) {
         if (!prompt || typeof prompt !== "string") {
-            throw new Error(`[GeminiService:${label}] Prompt must be a non-empty string.`);
+            throw new Error(`[MegaLLMService:${label}] Prompt must be a non-empty string.`);
         }
 
         try {
-            console.log(`[GeminiService:${label}] Generating…`);
+            console.log(`[MegaLLMService:${label}] Generating…`);
 
-            const result = await Promise.race([
-                this.#model.models.generateContent({
-                    model: MODEL,
-                    contents: PROMPTS.system(prompt),
-                }),
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error("Request timed out")), TIMEOUT_MS)
-                ),
-            ]);
+            const response = await this.#client.chat.completions.create({
+                model: MODEL,
+                messages: [
+                    { role: 'system', content: PROMPTS.system("") },
+                    { role: 'user', content: prompt }
+                ]
+            });
 
-            const content = result.text?.trim();
+            const content = response.choices[0]?.message?.content?.trim();
 
             if (!content) {
-                throw new Error("Empty response received from Gemini.");
+                throw new Error("Empty response received from MegaLLM.");
             }
 
             const parsed = parseJSON(content);
-            console.log(`[GeminiService:${label}] Success ✓`);
+            console.log(`[MegaLLMService:${label}] Success ✓`);
             return parsed;
         } catch (error) {
-            console.error(`[GeminiService:${label}] Failed:`, error.message);
-            throw new Error(`[GeminiService:${label}] ${error.message}`);
+            console.error(`[MegaLLMService:${label}] Failed:`, error.message);
+            throw new Error(`[MegaLLMService:${label}] ${error.message}`);
         }
     }
 
     // ── Public API ──────────────────────────────────────────────────────────
 
-    /** Generate a new lesson. */
     async generateLesson(prompt) {
         return this.#generate(prompt, "generateLesson");
     }
 
-    /** Regenerate / refine an existing lesson. */
     async regenerateLesson(prompt) {
         return this.#generate(prompt, "regenerateLesson");
     }
 
-    /** Generate a test / quiz. */
     async generateTest(prompt) {
         return this.#generate(prompt, "generateTest");
     }
 
-    /** Generate a custom test with user-specified parameters. */
     async generateCustomTest(prompt) {
         return this.#generate(prompt, "generateCustomTest");
     }
@@ -142,17 +119,3 @@ class GeminiService {
 
 const geminiService = new GeminiService();
 export default geminiService;
-
-// ─── Example Usage (uncomment to test) ──────────────────────────────────────
-//
-// import geminiService from "./gemini.service.js";
-//
-// const lesson = await geminiService.generateLesson(
-//   "Create a beginner lesson on JavaScript closures with 3 examples."
-// );
-// console.log(lesson);
-//
-// const test = await geminiService.generateTest(
-//   "Generate a 5-question MCQ quiz on JavaScript closures."
-// );
-// console.log(test);

@@ -8,6 +8,7 @@ const SubjectDetailPlaceholder = () => {
     const [topics, setTopics] = useState([]);
     const [subject, setSubject] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     useEffect(() => {
         const fetchSubjectAndTopics = async () => {
             try {
@@ -148,7 +149,13 @@ const SubjectDetailPlaceholder = () => {
                                             Mastered
                                         </span>
                                     ) : isNextTopic ? (
-                                        <button className="text-sm font-semibold text-[#000] bg-accent px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // prevent triggering parent div click
+                                                navigate(`/dashboard/subject/${subjectId}/topic/${topic._id}/lesson`);
+                                            }}
+                                            className="text-sm font-semibold text-[#000] bg-accent px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                                        >
                                             Start Lesson
                                         </button>
                                     ) : (

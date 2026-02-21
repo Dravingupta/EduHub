@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
+import fs from 'fs';
 import * as topicService from '../services/topic.service.js';
+import * as userService from '../services/user.service.js';
+import { generateVisualLesson } from '../services/lesson.service.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -73,6 +76,31 @@ export const deleteTopics = async (req, res, next) => {
 
         return successResponse(res, null, 'All topics deleted successfully');
     } catch (error) {
+        next(error);
+    }
+};
+
+export const generateLesson = async (req, res, next) => {
+    try {
+        const { topicId } = req.params;
+        const { forceRegenerate } = req.body || {};
+        const { uid } = req.user;
+
+        if (!isValidObjectId(topicId)) {
+            return errorResponse(res, 'Invalid topicId', 400);
+        }
+
+        const user = await userService.getOrCreateUser(uid);
+        if (!user) {
+            return errorResponse(res, 'User not found', 404);
+        }
+
+        const lessonData = await generateVisualLesson(user._id, topicId, forceRegenerate);
+
+        return successResponse(res, { lesson: lessonData }, 'Lesson generated successfully');
+    } catch (error) {
+        console.error("[CRITICAL] Lesson Generation Error:", error);
+        fs.writeFileSync('/tmp/eduhub2_error.log', error.stack || error.message);
         next(error);
     }
 };
