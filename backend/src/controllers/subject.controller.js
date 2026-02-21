@@ -40,10 +40,14 @@ export const createSubject = async (req, res, next) => {
             if (type === 'universal') {
                 const universalTopics = UNIVERSAL_SUBJECTS[subject_name];
                 if (universalTopics) {
-                    const syllabus = {
-                        "Core Curriculum": universalTopics
-                    };
-                    await topicService.createTopicsFromSyllabus(subject._id, syllabus);
+                    // Check if topics already exist (handles retry when subject was already created)
+                    const existingTopics = await topicService.getSubjectTopics(subject._id);
+                    if (!existingTopics || existingTopics.length === 0) {
+                        const syllabus = {
+                            "Core Curriculum": universalTopics
+                        };
+                        await topicService.createTopicsFromSyllabus(subject._id, syllabus);
+                    }
                 }
             }
         }

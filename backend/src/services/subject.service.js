@@ -5,7 +5,8 @@ export const createSubjectForUser = async (userId, subjectName, type = 'custom',
     const existing = await subjectRepository.findByUserAndName(userId, subjectName);
 
     if (existing) {
-        throw new Error('Subject already exists for this user');
+        // Return the existing subject instead of erroring — allows retry flows
+        return existing;
     }
 
     return await subjectRepository.createSubject({
