@@ -295,6 +295,239 @@ const BlockControls = ({
     );
 };
 
+/* ─── Floating Lesson Chat (AI Tutor) ─── */
+const LessonChat = ({ topicName, currentBlock }) => {
+    const [open, setOpen] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState("");
+    const [loading, setLoading] = useState(false);
+    const chatEndRef = useRef(null);
+
+    useEffect(() => {
+        if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    const cleanMarkdown = (text) =>
+        text
+            .replace(/```[\s\S]*?```/g, '')
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/^#{1,6}\s+/gm, '')
+            .replace(/^[-*•]\s+/gm, '- ')
+            .trim();
+
+    const handleSend = async () => {
+        const text = input.trim();
+        if (!text || loading) return;
+
+        const userMsg = { role: "user", content: text };
+        const updated = [...messages, userMsg];
+        setMessages(updated);
+        setInput("");
+        setLoading(true);
+
+        try {
+            const blockContent = typeof currentBlock?.content === 'string'
+                ? currentBlock.content
+                : JSON.stringify(currentBlock?.content || '');
+
+            const res = await api.post("/chat/lesson", {
+                topicName: topicName || "General",
+                blockTitle: currentBlock?.title || "",
+                blockContent,
+                userMessage: text,
+                chatHistory: messages
+            });
+
+            const rawReply = res.data?.data?.reply || "Sorry, I couldn't generate a response.";
+            const reply = cleanMarkdown(rawReply);
+            setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+        } catch (err) {
+            console.error(err);
+            setMessages(prev => [...prev, { role: "assistant", content: "⚠️ Failed to get a response. Please try again." }]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <>
+            {/* Floating toggle button */}
+            <button
+                onClick={() => setOpen(prev => !prev)}
+                style={{
+                    position: "fixed",
+                    bottom: "24px",
+                    right: "24px",
+                    width: open ? "48px" : "auto",
+                    height: "48px",
+                    borderRadius: open ? "50%" : "24px",
+                    border: "1px solid #333",
+                    background: "linear-gradient(145deg, #1E1E1E, #161616)",
+                    color: "#C8A24C",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    padding: open ? "0" : "0 16px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                    zIndex: 1001,
+                    transition: "all 0.3s ease",
+                    fontSize: open ? "1.2rem" : "0.9rem",
+                    fontWeight: "bold"
+                }}
+            >
+                {open ? "✕" : "💬 Ask AI Tutor"}
+            </button>
+
+            {/* Chat panel */}
+            {open && (
+                <div style={{
+                    position: "fixed",
+                    bottom: "84px",
+                    right: "24px",
+                    width: "380px",
+                    maxHeight: "500px",
+                    background: "linear-gradient(145deg, #1A1A1A, #0E0E0E)",
+                    border: "1px solid #262626",
+                    borderRadius: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    zIndex: 1000,
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+                    animation: "fadeInUp 0.25s ease-out"
+                }}>
+                    {/* Header */}
+                    <div style={{
+                        padding: "14px 16px",
+                        borderBottom: "1px solid #262626",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px"
+                    }}>
+                        <span style={{ fontSize: "1.1rem" }}>🤖</span>
+                        <div>
+                            <div style={{ color: "#F5F5F5", fontWeight: "bold", fontSize: "0.9rem" }}>AI Lesson Tutor</div>
+                            <div style={{ color: "#A1A1AA", fontSize: "0.7rem" }}>Ask anything about this lesson</div>
+                        </div>
+                    </div>
+
+                    {/* Messages */}
+                    <div style={{
+                        flex: 1,
+                        overflowY: "auto",
+                        padding: "12px 14px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        minHeight: "250px",
+                        maxHeight: "350px"
+                    }}>
+                        {messages.length === 0 && (
+                            <div style={{
+                                color: "#555",
+                                fontSize: "0.85rem",
+                                textAlign: "center",
+                                marginTop: "2rem"
+                            }}>
+                                Ask a question about what you're learning!
+                            </div>
+                        )}
+
+                        {messages.map((msg, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                                    maxWidth: "85%",
+                                    padding: "10px 14px",
+                                    borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
+                                    background: msg.role === "user"
+                                        ? "linear-gradient(135deg, #C8A24C, #A88734)"
+                                        : "#1E1E1E",
+                                    color: msg.role === "user" ? "#000" : "#E2E8F0",
+                                    fontSize: "0.85rem",
+                                    lineHeight: "1.5",
+                                    border: msg.role === "user" ? "none" : "1px solid #2A2A2A"
+                                }}
+                            >
+                                {msg.content}
+                            </div>
+                        ))}
+
+                        {loading && (
+                            <div style={{
+                                alignSelf: "flex-start",
+                                padding: "10px 14px",
+                                borderRadius: "14px 14px 14px 4px",
+                                background: "#1E1E1E",
+                                border: "1px solid #2A2A2A",
+                                color: "#A1A1AA",
+                                fontSize: "0.85rem"
+                            }}>
+                                Thinking...
+                            </div>
+                        )}
+                        <div ref={chatEndRef} />
+                    </div>
+
+                    {/* Input */}
+                    <div style={{
+                        padding: "12px 14px",
+                        borderTop: "1px solid #262626",
+                        display: "flex",
+                        gap: "8px"
+                    }}>
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={e => setInput(e.target.value)}
+                            onKeyDown={e => e.key === "Enter" && handleSend()}
+                            placeholder="Type your question..."
+                            style={{
+                                flex: 1,
+                                padding: "10px 14px",
+                                borderRadius: "10px",
+                                border: "1px solid #333",
+                                background: "#0E0E0E",
+                                color: "#F5F5F5",
+                                fontSize: "0.85rem",
+                                outline: "none"
+                            }}
+                        />
+                        <button
+                            onClick={handleSend}
+                            disabled={loading || !input.trim()}
+                            style={{
+                                padding: "10px 16px",
+                                borderRadius: "10px",
+                                border: "none",
+                                background: loading || !input.trim() ? "#333" : "#C8A24C",
+                                color: loading || !input.trim() ? "#666" : "#000",
+                                fontWeight: "bold",
+                                cursor: loading || !input.trim() ? "not-allowed" : "pointer",
+                                fontSize: "0.85rem",
+                                transition: "all 0.2s ease"
+                            }}
+                        >
+                            Send
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+        </>
+    );
+};
+
 /* ─── Main LessonView component ─── */
 const LessonView = () => {
     const { subjectId, topicId } = useParams();
@@ -553,6 +786,12 @@ const LessonView = () => {
             <div>
                 {lessonData.blocks.map((block, index) => renderBlock(block, index))}
             </div>
+
+            {/* Floating AI Tutor Chat */}
+            <LessonChat
+                topicName={lessonData?.topic_name || ""}
+                currentBlock={lessonData.blocks[currentVisibleIndex]}
+            />
         </div>
     );
 };

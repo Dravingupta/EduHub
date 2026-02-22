@@ -49,3 +49,45 @@ RULES:
 
     return await geminiService.chatWithConcept(messages);
 };
+
+/**
+ * Lesson helper chat — provides tutoring within a lesson context.
+ * @param {object} params
+ * @param {string} params.topicName       - Current topic name
+ * @param {string} params.blockTitle      - Current lesson block title
+ * @param {string} params.blockContent    - Current lesson block content (truncated)
+ * @param {string} params.userMessage     - The student's question
+ * @param {Array}  params.chatHistory     - Previous messages [{role, content}]
+ * @returns {Promise<string>} AI response text
+ */
+export const askLessonQuestion = async ({
+    topicName,
+    blockTitle,
+    blockContent,
+    userMessage,
+    chatHistory = []
+}) => {
+    const contentSnippet = blockContent?.substring(0, 500) || '';
+
+    const systemPrompt = `You are an expert tutor helping a student who is studying a lesson on "${topicName}".
+
+CURRENT LESSON SECTION:
+- Title: "${blockTitle}"
+- Content snippet: "${contentSnippet}"
+
+RULES:
+1. Answer questions about this topic clearly and patiently.
+2. Use analogies, examples, and step-by-step explanations when helpful.
+3. Keep responses concise (3-6 sentences) unless the student asks for more detail.
+4. If the student asks about something outside this topic, briefly answer but guide them back.
+5. Use simple language. Avoid unnecessary jargon.
+6. NEVER use markdown formatting. No **, no *, no #, no \`\`\`, no bullet symbols. Respond in plain text only. Use simple dashes (-) for lists if needed.`;
+
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        ...chatHistory,
+        { role: 'user', content: userMessage }
+    ];
+
+    return await geminiService.chatWithConcept(messages);
+};
