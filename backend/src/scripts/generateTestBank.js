@@ -7,7 +7,11 @@ import geminiService from "../services/llm/gemini.service.js";
 import { countTestSetsByTopic, createTestSet } from "../repositories/testBank.repository.js";
 
 // Load environment variables for standalone execution
-dotenv.config();
+import * as url from 'url';
+import path from 'path';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 // Define universal subjects and their topics
 const universalSubjects = {
@@ -76,13 +80,13 @@ Generate 10 MCQs for topic: "${topicName}"
 
 Rules:
 Strict JSON only
-No explanations
 Return an object containing an array named "questions"
 
 Each question must contain:
 - "question" (string)
 - "options" (array of 4 strings)
 - "correct_answer" (string, must exactly match one of the options)
+- "explanation" (string, 1-2 concise sentences explaining the correct answer)
 - "difficulty" ("easy" | "medium" | "hard")
 - "concept_tag" (string, short sub-topic)
 
@@ -98,6 +102,7 @@ Return format:
       "question": "",
       "options": [],
       "correct_answer": "",
+      "explanation": "",
       "difficulty": "",
       "concept_tag": ""
     }

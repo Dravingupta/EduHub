@@ -1,6 +1,7 @@
 import geminiService from './llm/gemini.service.js';
 import * as topicRepository from '../repositories/topic.repository.js';
 import * as subjectRepository from '../repositories/subject.repository.js';
+import * as universalLessonRepository from '../repositories/universalLesson.repository.js';
 
 /**
  * Generates a structured progressive lesson via Gemini.
@@ -36,6 +37,17 @@ export const generateVisualLesson = async (userId, topicId, forceRegenerate = fa
     // Verify authorized user
     if (subject.user_id.toString() !== userId.toString()) {
         throw new Error("Unauthorized access to this subject context");
+    }
+
+    // 2.5. Check UniversalLesson Cache
+    if (subject.type === 'universal' && !forceRegenerate) {
+        const universalCache = await universalLessonRepository.findBySubjectAndTopic(subject.subject_name, topic.topic_name);
+        if (universalCache && universalCache.lesson_data) {
+            console.log(`[LessonService] Loading Universal cached lesson for Topic: ${topic.topic_name}`);
+            topic.lesson_data = universalCache.lesson_data;
+            await topic.save();
+            return universalCache.lesson_data;
+        }
     }
 
     // 3. Extract Context Variables
