@@ -33,7 +33,17 @@ app.use(xss());
 
 // Body parser
 app.use(express.json({ limit: '10mb' }));
-app.use(cors());
+
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'https://edu-hub-brown-two.vercel.app'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Rate limiting (all /api routes)
 app.use('/api', rateLimiter);
