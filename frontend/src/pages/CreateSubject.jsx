@@ -14,7 +14,6 @@ const UNIVERSAL_SUBJECTS = [
 const CreateSubject = () => {
     const [type, setType] = useState("universal");
     const [subjectName, setSubjectName] = useState(UNIVERSAL_SUBJECTS[0]);
-    const [timelineDays, setTimelineDays] = useState(120);
     const [loading, setLoading] = useState(false);
     const [statusMessage, setStatusMessage] = useState("");
     const [error, setError] = useState(null);
@@ -54,11 +53,6 @@ const CreateSubject = () => {
             return;
         }
 
-        if (timelineDays < 60) {
-            setError("Timeline must be at least 60 days.");
-            return;
-        }
-
         if (type === "custom" && (!syllabusText || syllabusText.length < 50)) {
             setError("Syllabus text is required and must be at least 50 characters for Custom subjects.");
             return;
@@ -72,7 +66,7 @@ const CreateSubject = () => {
             const subjectRes = await api.post("/subjects", {
                 subject_name: subjectName,
                 type: type,
-                target_days: parseInt(timelineDays, 10),
+                target_days: 120,
                 ...(type === "custom" && { syllabusText })
             });
 
@@ -237,33 +231,6 @@ const CreateSubject = () => {
                         </div>
                     </div>
                 )}
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <label htmlFor="timelineDays" style={{ color: "#A1A1AA", fontSize: "0.875rem" }}>Target Completion Timeline (Days) *</label>
-                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <input
-                            id="timelineDays"
-                            type="number"
-                            min="60"
-                            max="365"
-                            value={timelineDays}
-                            onChange={(e) => setTimelineDays(e.target.value)}
-                            disabled={loading}
-                            style={{
-                                flex: 1,
-                                padding: "0.75rem",
-                                background: "#0E0E0E",
-                                border: "1px solid #262626",
-                                color: "#F5F5F5",
-                                borderRadius: "4px",
-                                outline: "none"
-                            }}
-                        />
-                        <span style={{ color: "#A1A1AA", fontSize: "0.875rem", flexShrink: 0 }}>
-                            Minimum: 60 days
-                        </span>
-                    </div>
-                </div>
 
                 <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
                     <button
