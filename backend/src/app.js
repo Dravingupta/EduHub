@@ -15,6 +15,7 @@ import analyticsRoutes from './routes/analytics.routes.js';
 import streakRoutes from './routes/streak.routes.js';
 import readinessRoutes from './routes/readiness.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 
 // Middlewares
 import errorHandler from './middlewares/error.middleware.js';
@@ -50,6 +51,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/streak', streakRoutes);
 app.use('/api/readiness', readinessRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Route Placeholder for development
 app.get('/', (req, res) => {

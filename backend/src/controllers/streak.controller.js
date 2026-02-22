@@ -31,3 +31,15 @@ export const getStreakAnalytics = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getActivityHeatmap = async (req, res, next) => {
+    try {
+        const { uid } = req.user;
+        const user = await userService.getOrCreateUser(uid);
+        const activities = await streakService.getActivityHeatmapData(user._id);
+
+        return successResponse(res, { activities }, 'Heatmap data fetched');
+    } catch (error) {
+        next(error);
+    }
+};

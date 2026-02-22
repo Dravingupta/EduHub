@@ -99,7 +99,13 @@ Each block object must strictly contain:
 - "content": (string, object, or array depending on what best represents the block)
 - "metadata": (optional object for extra contextual data)
 
-For "diagram" type blocks: the "content" field MUST contain ONLY valid Mermaid.js syntax (e.g. graph TD, graph LR, sequenceDiagram, mindmap). Do NOT wrap in code fences. Use simple node labels. Always include at least 1 diagram block.
+For "diagram" type blocks: the "content" field MUST contain ONLY valid Mermaid.js syntax. STRICT RULES:
+  * Use ONLY "graph TD" or "graph LR" (do NOT use "flowchart" or "mindmap" or "sequenceDiagram").
+  * Use simple single-word node IDs (A, B, C) with labels in square brackets: A["Label text"]
+  * Do NOT use parentheses () for node shapes — only square brackets [].
+  * Do NOT use special characters like |, &, <, >, or semicolons in labels.
+  * Do NOT wrap in code fences. Keep labels short (2-5 words max).
+  * Always include at least 1 diagram block.
 
 Output ONLY the JSON array.
 `;

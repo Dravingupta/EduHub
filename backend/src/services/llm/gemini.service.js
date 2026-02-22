@@ -129,6 +129,43 @@ class GeminiService { // Kept name GeminiService for compatibility with import u
     async generateCustomTest(prompt) {
         return this.#generate(prompt, "generateCustomTest");
     }
+
+    /**
+     * Chat-style completion for concept explanations (plain text, no JSON).
+     * @param {Array<{role: string, content: string}>} messages
+     * @returns {Promise<string>} AI response text
+     */
+    async chatWithConcept(messages) {
+        const MAX_RETRIES = 2;
+        let delayMs = 1000;
+        let lastError;
+
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                console.log(`[MegaLLMService:conceptChat] Generating… (Attempt ${attempt}/${MAX_RETRIES})`);
+
+                const response = await this.#client.chat.completions.create({
+                    model: MODEL,
+                    messages
+                });
+
+                const content = response.choices[0]?.message?.content?.trim();
+                if (!content) throw new Error("Empty response from LLM.");
+
+                console.log(`[MegaLLMService:conceptChat] Success ✓`);
+                return content;
+            } catch (error) {
+                lastError = error;
+                console.warn(`[MegaLLMService:conceptChat] Attempt ${attempt} failed: ${error.message}`);
+                if (attempt < MAX_RETRIES) {
+                    await new Promise(r => setTimeout(r, delayMs));
+                    delayMs *= 2;
+                }
+            }
+        }
+
+        throw new Error(`[MegaLLMService:conceptChat] ${lastError?.message || "Unknown error"}`);
+    }
 }
 
 // ─── Singleton Export ───────────────────────────────────────────────────────

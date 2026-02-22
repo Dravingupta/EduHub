@@ -123,3 +123,18 @@ export const getStreakAnalytics = async (userId) => {
         total_active_days: activities.length,
     };
 };
+
+export const getActivityHeatmapData = async (userId) => {
+    const activities = await activityRepository.getUserActivities(userId);
+
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    oneYearAgo.setHours(0, 0, 0, 0);
+
+    return activities
+        .filter(a => new Date(a.date).getTime() >= oneYearAgo.getTime())
+        .map(a => ({
+            date: new Date(a.date).toISOString().split('T')[0],
+            count: (a.assignments_completed || 0) + (a.topics_completed || 0),
+        }));
+};

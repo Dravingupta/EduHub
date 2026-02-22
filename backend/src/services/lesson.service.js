@@ -74,7 +74,14 @@ Follow this strict schema:
 BLOCK TYPE RULES:
 - "concept": Standard explanation cards. Use proper Markdown and LaTeX ($ inline $, $$ block $$) for math formulas or matrices. Do NOT use Mermaid here.
 - "example": Concrete analogies, code snippets, or mathematical step-by-step applications. Use LaTeX for math.
-- "diagram": Visual diagram block. The 'content' field MUST contain ONLY valid Mermaid.js syntax code (e.g. flowchart TD, mindmap). Do NOT wrap in markdown code fences. Use simple node labels and NO mathematical brackets or special characters inside the mermaid graph.
+- "diagram": Visual diagram block. The 'content' field MUST contain ONLY valid Mermaid.js syntax. STRICT RULES for diagrams:
+  * Use ONLY "graph TD" or "graph LR" as the diagram type (do NOT use "flowchart").
+  * Use simple single-word node IDs (A, B, C, etc.) with labels in square brackets: A["Label text"]
+  * Do NOT use parentheses () for node shapes — only square brackets [].
+  * Do NOT use special characters like |, &, <, >, or semicolons in labels.
+  * Do NOT wrap in markdown code fences.
+  * Keep labels short (2-5 words max).
+  * Example: graph TD\n  A["Newton Laws"] --> B["First Law"]\n  A --> C["Second Law"]\n  A --> D["Third Law"]
 - "mistakes": Common pitfalls or student misconceptions.
 - "summary": The final wrap-up before an assignment.
 

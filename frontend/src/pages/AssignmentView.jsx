@@ -2,6 +2,189 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 
+/* ─── Concept Chat Component ─────────────────────────────────────────────── */
+
+const ConceptChat = ({ question, explanation, correctAnswer, userAnswer }) => {
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleSend = async () => {
+        const text = input.trim();
+        if (!text || loading) return;
+
+        const userMsg = { role: "user", content: text };
+        const updatedMessages = [...messages, userMsg];
+        setMessages(updatedMessages);
+        setInput("");
+        setLoading(true);
+
+        try {
+            const res = await api.post("/chat/concept", {
+                question,
+                explanation,
+                correctAnswer,
+                userAnswer,
+                userMessage: text,
+                chatHistory: messages  // previous messages (excludes current)
+            });
+
+            const rawReply = res.data?.data?.reply || "Sorry, I couldn't generate a response.";
+            // Strip any markdown formatting the LLM might still produce
+            const reply = rawReply
+                .replace(/```[\s\S]*?```/g, '')   // code blocks
+                .replace(/\*\*(.*?)\*\*/g, '$1')    // bold
+                .replace(/\*(.*?)\*/g, '$1')        // italic
+                .replace(/^#{1,6}\s+/gm, '')        // headings
+                .replace(/^[-*•]\s+/gm, '- ')       // normalize bullets
+                .trim();
+            setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+        } catch (err) {
+            console.error(err);
+            setMessages(prev => [...prev, { role: "assistant", content: "⚠️ Failed to get a response. Please try again." }]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
+    return (
+        <div style={{
+            marginTop: "0.75rem",
+            background: "#161616",
+            border: "1px solid #2A2A2A",
+            borderRadius: "10px",
+            overflow: "hidden"
+        }}>
+            {/* Chat header */}
+            <div style={{
+                padding: "0.6rem 1rem",
+                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(200, 162, 76, 0.05))",
+                borderBottom: "1px solid #2A2A2A",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem"
+            }}>
+                <span style={{ fontSize: "1rem" }}>🤖</span>
+                <span style={{ color: "#A1A1AA", fontSize: "0.8rem", fontWeight: 600 }}>AI Tutor</span>
+                <span style={{ color: "#555", fontSize: "0.7rem", marginLeft: "auto" }}>Ask anything about this concept</span>
+            </div>
+
+            {/* Messages area */}
+            <div style={{
+                maxHeight: "280px",
+                overflowY: "auto",
+                padding: "0.75rem"
+            }}>
+                {messages.length === 0 && (
+                    <div style={{
+                        textAlign: "center",
+                        color: "#555",
+                        fontSize: "0.8rem",
+                        padding: "1rem 0"
+                    }}>
+                        Ask a question to understand this concept better
+                    </div>
+                )}
+
+                {messages.map((msg, idx) => (
+                    <div key={idx} style={{
+                        display: "flex",
+                        justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                        marginBottom: "0.5rem"
+                    }}>
+                        <div style={{
+                            maxWidth: "85%",
+                            padding: "0.6rem 0.9rem",
+                            borderRadius: msg.role === "user" ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
+                            background: msg.role === "user"
+                                ? "rgba(200, 162, 76, 0.15)"
+                                : "rgba(255, 255, 255, 0.04)",
+                            border: msg.role === "user"
+                                ? "1px solid rgba(200, 162, 76, 0.25)"
+                                : "1px solid #2A2A2A",
+                            color: msg.role === "user" ? "#E5D5A0" : "#CCCCCC",
+                            fontSize: "0.85rem",
+                            lineHeight: "1.55",
+                            whiteSpace: "pre-wrap"
+                        }}>
+                            {msg.content}
+                        </div>
+                    </div>
+                ))}
+
+                {loading && (
+                    <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "0.5rem" }}>
+                        <div style={{
+                            padding: "0.6rem 0.9rem",
+                            borderRadius: "12px 12px 12px 2px",
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid #2A2A2A",
+                            color: "#888",
+                            fontSize: "0.85rem"
+                        }}>
+                            <span style={{ display: "inline-block", animation: "pulse 1.5s infinite" }}>Thinking…</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Input area */}
+            <div style={{
+                display: "flex",
+                gap: "0.5rem",
+                padding: "0.6rem 0.75rem",
+                borderTop: "1px solid #2A2A2A",
+                background: "#111"
+            }}>
+                <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Why is this the correct answer?"
+                    disabled={loading}
+                    style={{
+                        flex: 1,
+                        background: "#1A1A1A",
+                        border: "1px solid #333",
+                        borderRadius: "8px",
+                        padding: "0.55rem 0.75rem",
+                        color: "#F5F5F5",
+                        fontSize: "0.85rem",
+                        outline: "none"
+                    }}
+                />
+                <button
+                    onClick={handleSend}
+                    disabled={loading || !input.trim()}
+                    style={{
+                        background: (loading || !input.trim()) ? "#333" : "#C8A24C",
+                        color: (loading || !input.trim()) ? "#666" : "#000",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "0.55rem 1rem",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        cursor: (loading || !input.trim()) ? "not-allowed" : "pointer",
+                        transition: "all 0.2s"
+                    }}
+                >
+                    Send
+                </button>
+            </div>
+        </div>
+    );
+};
+
+/* ─── Assignment View ────────────────────────────────────────────────────── */
+
 const AssignmentView = () => {
     const { subjectId, topicId } = useParams();
     const navigate = useNavigate();
@@ -13,6 +196,7 @@ const AssignmentView = () => {
     const [answers, setAnswers] = useState({});
     const [startTime, setStartTime] = useState(null);
     const [evaluation, setEvaluation] = useState(null);
+    const [openChats, setOpenChats] = useState({});   // { question_id: true/false }
 
     useEffect(() => {
         const fetchAssignment = async () => {
@@ -62,6 +246,10 @@ const AssignmentView = () => {
 
     const handleReturn = () => {
         navigate(`/dashboard/subject/${subjectId}`);
+    };
+
+    const toggleChat = (qId) => {
+        setOpenChats(prev => ({ ...prev, [qId]: !prev[qId] }));
     };
 
     if (loading) return <div style={{ padding: "2rem", color: "#A1A1AA", textAlign: "center" }}>AI is generating your 10-MCQ test...</div>;
@@ -174,6 +362,41 @@ const AssignmentView = () => {
                                 <div style={{ marginTop: "1rem", padding: "1rem", background: "rgba(200, 162, 76, 0.05)", borderRadius: "6px", borderLeft: "4px solid #C8A24C" }}>
                                     <h5 style={{ color: "#C8A24C", marginBottom: "0.5rem", fontSize: "0.875rem" }}>Explanation:</h5>
                                     <p style={{ color: "#A1A1AA", lineHeight: "1.5", fontSize: "0.9rem" }}>{q.explanation}</p>
+
+                                    {/* Ask AI button — shown for incorrect answers */}
+                                    {!q.is_correct && (
+                                        <div style={{ marginTop: "0.75rem" }}>
+                                            <button
+                                                onClick={() => toggleChat(q.question_id)}
+                                                style={{
+                                                    background: openChats[q.question_id] ? "rgba(99, 102, 241, 0.15)" : "rgba(99, 102, 241, 0.08)",
+                                                    border: "1px solid rgba(99, 102, 241, 0.25)",
+                                                    color: "#818CF8",
+                                                    padding: "0.45rem 0.9rem",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    fontSize: "0.8rem",
+                                                    fontWeight: 600,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.4rem",
+                                                    transition: "all 0.2s"
+                                                }}
+                                            >
+                                                <span>💬</span>
+                                                {openChats[q.question_id] ? "Hide AI Tutor" : "Ask AI about this"}
+                                            </button>
+
+                                            {openChats[q.question_id] && (
+                                                <ConceptChat
+                                                    question={q.question}
+                                                    explanation={q.explanation}
+                                                    correctAnswer={q.correct_answer}
+                                                    userAnswer={q.selected_answer}
+                                                />
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -208,6 +431,13 @@ const AssignmentView = () => {
                     </div>
                 )}
             </div>
+
+            <style>{`
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                }
+            `}</style>
         </div>
     );
 };

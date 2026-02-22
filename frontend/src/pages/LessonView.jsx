@@ -27,39 +27,32 @@ mermaid.initialize({
 const MermaidDiagram = ({ chart }) => {
     const containerRef = useRef(null);
     const [error, setError] = useState(false);
+    const [rawSyntax, setRawSyntax] = useState("");
 
     const renderChart = useCallback(async () => {
         if (!containerRef.current || !chart) return;
         try {
-            // Clean the chart string
             let cleanChart = chart.trim();
-            // Remove markdown code fences if LLM wrapped them
-            cleanChart = cleanChart.replace(/^```mermaid\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/i, "");
 
-            // Aggressive sanitization: LLMs often output special characters inside brackets which breaks Mermaid.
-            // We need to wrap contents inside [ ] or ( ) with quotes if they aren't already quoted,
-            // OR simply replace dangerous characters like | = with safe alternatives in labels.
-            // A simpler approach is to use the loose security level and let Mermaid handle it, but we can't control LLM syntax perfectly.
-            // Let's at least replace the most common breaking characters inside node labels if they are unquoted.
-            cleanChart = cleanChart.replace(/\[([^"\]]+)\]/g, (match, p1) => {
-                // If it's already properly quoted inside the brackets, leave it
-                if (p1.startsWith('"') && p1.endsWith('"')) return match;
-                // Otherwise, quote it and escape existing quotes
-                return `["${p1.replace(/"/g, '\\"')}"]`;
-            });
+            // Remove markdown code fences the LLM might wrap
+            cleanChart = cleanChart
+                .replace(/^```(?:mermaid)?\s*/i, "")
+                .replace(/\s*```\s*$/i, "");
 
-            // Same for parentheses nodes ( )
-            cleanChart = cleanChart.replace(/\(([^")]+)\)/g, (match, p1) => {
-                if (p1.startsWith('"') && p1.endsWith('"')) return match;
-                return `("${p1.replace(/"/g, '\\"')}")`;
-            });
+            // Remove trailing semicolons on lines (breaks some Mermaid versions)
+            cleanChart = cleanChart
+                .split("\n")
+                .map(line => line.replace(/;\s*$/, ""))
+                .join("\n");
+
+            setRawSyntax(cleanChart);
 
             const id = `mermaid-${Math.random().toString(36).substring(2, 10)}`;
             const { svg } = await mermaid.render(id, cleanChart);
             containerRef.current.innerHTML = svg;
             setError(false);
         } catch (err) {
-            console.error("Mermaid render error:", err);
+            console.warn("Mermaid render error:", err?.message || err);
             setError(true);
         }
     }, [chart]);
@@ -71,7 +64,11 @@ const MermaidDiagram = ({ chart }) => {
     if (error) {
         return (
             <div className="bg-[#1A1A2E] border border-[#333] rounded-xl p-4">
-                <pre className="text-xs text-textSecondary overflow-x-auto whitespace-pre-wrap">{chart}</pre>
+                <div className="flex items-center gap-2 mb-2 text-amber-400 text-xs font-semibold">
+                    <span>⚠️</span>
+                    <span>Diagram couldn't render — showing raw syntax</span>
+                </div>
+                <pre className="text-xs text-textSecondary overflow-x-auto whitespace-pre-wrap">{rawSyntax}</pre>
             </div>
         );
     }
