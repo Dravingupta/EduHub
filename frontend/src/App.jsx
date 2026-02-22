@@ -12,42 +12,45 @@ import LessonView from './pages/LessonView';
 import AssignmentView from './pages/AssignmentView';
 import AnalyticsOverview from './pages/AnalyticsOverview';
 import SubjectAnalyticsDetail from './pages/SubjectAnalyticsDetail';
+import WakeUpLoader from './components/WakeUpLoader';
 
 function App() {
   return (
-    <Routes>
-      {/* Public Routes with MainLayout */}
-      <Route path="/" element={
-        <MainLayout>
-          <LandingPage />
-        </MainLayout>
-      } />
+    <WakeUpLoader>
+      <Routes>
+        {/* Public Routes with MainLayout */}
+        <Route path="/" element={
+          <MainLayout>
+            <LandingPage />
+          </MainLayout>
+        } />
 
-      {/* Auth Route */}
-      <Route path="/login" element={<Login />} />
+        {/* Auth Route */}
+        <Route path="/login" element={<Login />} />
 
-      {/* Protected Dashboard Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      >
-        {/* Nested Routes inside Dashboard's <Outlet /> */}
-        <Route index element={<Subjects />} />
-        <Route path="analytics" element={<AnalyticsOverview />} />
-        <Route path="analytics/:subjectId" element={<SubjectAnalyticsDetail />} />
-        <Route path="create-subject" element={<CreateSubject />} />
-        <Route path="subject/:subjectId" element={<SubjectDetail />} />
-        <Route path="subject/:subjectId/topic/:topicId/lesson" element={<LessonView />} />
-        <Route path="subject/:subjectId/topic/:topicId/assignment" element={<AssignmentView />} />
-      </Route>
+        {/* Protected Dashboard Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        >
+          {/* Nested Routes inside Dashboard's <Outlet /> */}
+          <Route index element={<Subjects />} />
+          <Route path="analytics" element={<AnalyticsOverview />} />
+          <Route path="analytics/:subjectId" element={<SubjectAnalyticsDetail />} />
+          <Route path="create-subject" element={<CreateSubject />} />
+          <Route path="subject/:subjectId" element={<SubjectDetail />} />
+          <Route path="subject/:subjectId/topic/:topicId/lesson" element={<LessonView />} />
+          <Route path="subject/:subjectId/topic/:topicId/assignment" element={<AssignmentView />} />
+        </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<Login />} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<Login />} />
+      </Routes>
+    </WakeUpLoader>
   );
 }
 
