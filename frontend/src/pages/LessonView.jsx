@@ -794,7 +794,20 @@ const LessonView = () => {
         );
     }
 
-    if (!lessonData || !lessonData.blocks) return null;
+    /* ─── Initial Full-Screen Loading State ─── */
+    if (loading && !hasData) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <div className="relative w-12 h-12">
+                    <div className="absolute inset-0 rounded-full border-2 border-accent/20" />
+                    <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-accent animate-spin" />
+                </div>
+                <p className="text-textSecondary text-sm animate-pulse">Generating interactive lesson…</p>
+            </div>
+        );
+    }
+
+    if (!hasData && !loading) return null;
 
     return (
         <div className="max-w-[840px] mx-auto w-full px-4 pb-8">
