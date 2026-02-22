@@ -133,8 +133,14 @@ export const getActivityHeatmapData = async (userId) => {
 
     return activities
         .filter(a => new Date(a.date).getTime() >= oneYearAgo.getTime())
-        .map(a => ({
-            date: new Date(a.date).toISOString().split('T')[0],
-            count: (a.assignments_completed || 0) + (a.topics_completed || 0),
-        }));
+        .map(a => {
+            const d = new Date(a.date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return {
+                date: `${year}-${month}-${day}`,
+                count: (a.assignments_completed || 0) + (a.topics_completed || 0),
+            };
+        });
 };

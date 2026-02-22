@@ -47,9 +47,9 @@ const Subjects = () => {
     if (densityPref > 65) learningStyle = "Deep & Detailed";
 
     return (
-        <div>
+        <div className="animate-fade-in">
             {/* Context & Analytics Header */}
-            <div style={{ marginBottom: "3rem" }}>
+            <div style={{ marginBottom: "3rem" }} className="animate-slide-up">
                 <h2 style={{ marginBottom: "1.5rem", color: "#F5F5F5", fontSize: "1.5rem" }}>Learning Context</h2>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
@@ -87,7 +87,7 @@ const Subjects = () => {
             </div>
 
             {/* Subjects List */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+            <div className="animate-slide-up" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", animationDelay: "0.2s", animationFillMode: "both" }}>
                 <h2 style={{ color: "#F5F5F5", fontSize: "1.5rem", margin: 0 }}>Your Subjects</h2>
                 <button
                     onClick={() => navigate("/dashboard/create-subject")}
@@ -103,25 +103,30 @@ const Subjects = () => {
                 </div>
             ) : (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.5rem" }}>
-                    {subjects.map((subject) => (
+                    {subjects.map((subject, index) => (
                         <div
                             key={subject._id}
+                            className="animate-slide-up group"
                             onClick={() => navigate(`/dashboard/subject/${subject._id}`)}
                             style={{
+                                animationDelay: `${0.3 + (index * 0.1)}s`,
+                                animationFillMode: "both",
                                 background: "#161616",
                                 border: "1px solid #262626",
                                 borderRadius: "8px",
                                 padding: "1.5rem",
                                 cursor: "pointer",
-                                transition: "transform 0.2s ease, border-color 0.2s ease",
+                                transition: "all 0.3s ease",
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = "translateY(-4px)";
                                 e.currentTarget.style.borderColor = "#C8A24C";
+                                e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.5)";
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = "translateY(0)";
                                 e.currentTarget.style.borderColor = "#262626";
+                                e.currentTarget.style.boxShadow = "none";
                             }}
                         >
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>

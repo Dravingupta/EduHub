@@ -90,8 +90,8 @@ const CreateSubject = () => {
     };
 
     return (
-        <div style={{ maxWidth: "500px", margin: "0 auto", padding: "2rem", background: "#161616", border: "1px solid #262626", borderRadius: "8px" }}>
-            <h2 style={{ marginBottom: "1.5rem" }}>Create New Subject</h2>
+        <div className="animate-slide-up" style={{ maxWidth: "500px", margin: "0 auto", padding: "2rem", background: "#161616", border: "1px solid #262626", borderRadius: "8px" }}>
+            <h2 className="animate-fade-in" style={{ marginBottom: "1.5rem" }}>Create New Subject</h2>
 
             {error && <div style={{ color: "#FC8181", marginBottom: "1rem", fontSize: "0.875rem", padding: "0.75rem", background: "rgba(252, 129, 129, 0.1)", borderRadius: "4px" }}>{error}</div>}
 

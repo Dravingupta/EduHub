@@ -50,7 +50,7 @@ const Login = () => {
             {/* Login Card */}
             <div className="relative z-10 w-full max-w-md">
                 {/* Brand */}
-                <div className="text-center mb-10">
+                <div className="text-center mb-10 animate-slide-up" style={{ animationFillMode: 'both' }}>
                     <div className="inline-flex items-center gap-3 mb-6">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent to-amber-500 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-accent/20">
                             E
@@ -68,7 +68,7 @@ const Login = () => {
                 </div>
 
                 {/* Card */}
-                <div className="bg-[#111111] border border-[#1E1E1E] rounded-3xl p-8 shadow-2xl shadow-black/50">
+                <div className="bg-[#111111] border border-[#1E1E1E] rounded-3xl p-8 shadow-2xl shadow-black/50 animate-fade-in" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
                     {/* Error message */}
                     {error && (
                         <div className="mb-5 px-4 py-3 bg-red-500/5 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">

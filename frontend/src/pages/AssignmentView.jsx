@@ -259,7 +259,7 @@ const AssignmentView = () => {
     const allAnswered = Object.keys(answers).length === assignment.questions.length;
 
     return (
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }} className="animate-fade-in">
             <div style={{ marginBottom: "2rem" }}>
                 <button
                     onClick={handleReturn}
@@ -288,7 +288,10 @@ const AssignmentView = () => {
                     {(evaluation ? evaluation.results : assignment.questions).map((q, i) => (
                         <div
                             key={q.question_id}
+                            className="animate-slide-up"
                             style={{
+                                animationDelay: `${0.1 + (i * 0.1)}s`,
+                                animationFillMode: "both",
                                 padding: "1.5rem",
                                 background: "#1E1E1E",
                                 borderRadius: "8px",

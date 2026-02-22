@@ -64,7 +64,12 @@ const ActivityHeatmap = () => {
                 const daysAgo = (WEEKS - 1 - w) * 7 + (todayDay - d);
                 const cellDate = new Date(today);
                 cellDate.setDate(today.getDate() - daysAgo);
-                const key = cellDate.toISOString().split("T")[0];
+
+                const year = cellDate.getFullYear();
+                const month = String(cellDate.getMonth() + 1).padStart(2, '0');
+                const day = String(cellDate.getDate()).padStart(2, '0');
+                const key = `${year}-${month}-${day}`;
+
                 week.push({ date: key, count: heatmapData[key] || 0 });
             }
             grid.push(week);
@@ -77,7 +82,7 @@ const ActivityHeatmap = () => {
     const totalActivities = Object.values(heatmapData).reduce((s, c) => s + c, 0);
 
     return (
-        <div style={{
+        <div className="animate-slide-up" style={{
             background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)",
             border: "1px solid #262626",
             borderRadius: "12px",
@@ -251,7 +256,7 @@ const AnalyticsOverview = () => {
     }
 
     return (
-        <div style={{ paddingBottom: "3rem" }}>
+        <div style={{ paddingBottom: "3rem" }} className="animate-fade-in">
             <h2 style={{ marginBottom: "2rem", color: "#F5F5F5", fontSize: "1.875rem", letterSpacing: "-0.02em" }}>Data Analytics Overview</h2>
 
             {/* Activity Heatmap — LeetCode style */}
@@ -259,7 +264,7 @@ const AnalyticsOverview = () => {
 
             {/* Top KPI Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
-                <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", position: "relative", overflow: "hidden" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.1s', animationFillMode: 'both', background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", position: "relative", overflow: "hidden", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <div style={{ position: "absolute", top: 0, right: 0, width: "100px", height: "100px", background: "radial-gradient(circle, rgba(200,162,76,0.1) 0%, rgba(0,0,0,0) 70%)", transform: "translate(30%, -30%)" }} />
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Global Mastery</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#C8A24C", marginTop: "0.5rem" }}>
@@ -267,7 +272,7 @@ const AnalyticsOverview = () => {
                     </div>
                 </div>
 
-                <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.2s', animationFillMode: 'both', background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Completion Rate</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#F5F5F5", marginTop: "0.5rem" }}>
                         {stats?.overall_completion_percentage || 0}%
@@ -277,7 +282,7 @@ const AnalyticsOverview = () => {
                     </div>
                 </div>
 
-                <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.3s', animationFillMode: 'both', background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Active Curriculum</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#F5F5F5", marginTop: "0.5rem" }}>
                         {stats?.total_subjects || 0}
@@ -285,7 +290,7 @@ const AnalyticsOverview = () => {
                     <div style={{ color: "#A1A1AA", fontSize: "0.875rem", marginTop: "0.25rem" }}>Subjects in focus</div>
                 </div>
 
-                <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.4s', animationFillMode: 'both', background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Adaptive Swaps Used</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#F5F5F5", marginTop: "0.5rem" }}>
                         {stats?.total_swap_usage || 0}
@@ -294,7 +299,7 @@ const AnalyticsOverview = () => {
                 </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }}>
+            <div className="animate-slide-up" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", animationDelay: '0.5s', animationFillMode: 'both' }}>
                 {/* Left Col: Areas for Improvement (Global Weak Topics) */}
                 <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "1.5rem" }}>

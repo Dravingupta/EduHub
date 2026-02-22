@@ -58,7 +58,7 @@ const SubjectAnalyticsDetail = () => {
     const { avg_mastery, completed_topics, completion_percentage, strong_topics_count, swap_count, total_topics, weak_topics_count } = progress || {};
 
     return (
-        <div style={{ paddingBottom: "3rem" }}>
+        <div style={{ paddingBottom: "3rem" }} className="animate-fade-in">
             <button
                 onClick={() => navigate("/dashboard/analytics")}
                 style={{ background: "transparent", color: "#A1A1AA", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", padding: "0", marginBottom: "2rem", fontSize: "0.875rem" }}
@@ -71,7 +71,7 @@ const SubjectAnalyticsDetail = () => {
 
             {/* Top KPI row specific to this subject */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem", marginBottom: "3rem" }}>
-                <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", position: "relative", overflow: "hidden" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.1s', animationFillMode: 'both', background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", position: "relative", overflow: "hidden", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <div style={{ position: "absolute", top: 0, right: 0, width: "100px", height: "100px", background: "radial-gradient(circle, rgba(200,162,76,0.1) 0%, rgba(0,0,0,0) 70%)", transform: "translate(30%, -30%)" }} />
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Average Mastery</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#C8A24C", marginTop: "0.5rem" }}>
@@ -79,7 +79,7 @@ const SubjectAnalyticsDetail = () => {
                     </div>
                 </div>
 
-                <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.2s', animationFillMode: 'both', background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Completion Rate</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#F5F5F5", marginTop: "0.5rem" }}>
                         {completion_percentage || 0}%
@@ -89,7 +89,7 @@ const SubjectAnalyticsDetail = () => {
                     </div>
                 </div>
 
-                <div style={{ background: "linear-gradient(145deg, rgba(72,187,120,0.05) 0%, #0E0E0E 100%)", border: "1px solid rgba(72, 187, 120, 0.2)", borderRadius: "12px", padding: "1.5rem" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.3s', animationFillMode: 'both', background: "linear-gradient(145deg, rgba(72,187,120,0.05) 0%, #0E0E0E 100%)", border: "1px solid rgba(72, 187, 120, 0.2)", borderRadius: "12px", padding: "1.5rem", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Strong Areas</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#48BB78", marginTop: "0.5rem" }}>
                         {strong_topics_count || 0}
@@ -97,7 +97,7 @@ const SubjectAnalyticsDetail = () => {
                     <div style={{ color: "#A1A1AA", fontSize: "0.875rem", marginTop: "0.25rem" }}>Mastered Topics</div>
                 </div>
 
-                <div style={{ background: "linear-gradient(145deg, rgba(252,129,129,0.05) 0%, #0E0E0E 100%)", border: "1px solid rgba(252, 129, 129, 0.2)", borderRadius: "12px", padding: "1.5rem" }}>
+                <div className="animate-slide-up group" style={{ animationDelay: '0.4s', animationFillMode: 'both', background: "linear-gradient(145deg, rgba(252,129,129,0.05) 0%, #0E0E0E 100%)", border: "1px solid rgba(252, 129, 129, 0.2)", borderRadius: "12px", padding: "1.5rem", transition: 'transform 0.3s ease, border-color 0.3s ease' }}>
                     <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Weak Areas</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#FC8181", marginTop: "0.5rem" }}>
                         {weak_topics_count || 0}
@@ -123,7 +123,7 @@ const SubjectAnalyticsDetail = () => {
                         }
 
                         return (
-                            <div key={idx} style={{ background: "#161616", border: "1px solid #262626", borderLeft: `4px solid ${statusColor}`, padding: "1.25rem", borderRadius: "8px" }}>
+                            <div key={idx} className="animate-slide-up hover:-translate-y-1 transition-transform duration-300" style={{ animationDelay: `${0.5 + (idx * 0.1)}s`, animationFillMode: 'both', background: "#161616", border: "1px solid #262626", borderLeft: `4px solid ${statusColor}`, padding: "1.25rem", borderRadius: "8px" }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
                                     <div style={{ color: "#F5F5F5", fontWeight: "bold", fontSize: "1.05rem", paddingRight: "1rem" }}>
                                         {topic.topic_name}

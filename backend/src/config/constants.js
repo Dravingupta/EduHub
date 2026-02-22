@@ -13,7 +13,7 @@ export const INACTIVITY_HOURS = 48;
 export const MAX_SWAPS_PER_TOPIC = 3;
 
 export const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-export const RATE_LIMIT_MAX_REQUESTS = 100;
+export const RATE_LIMIT_MAX_REQUESTS = 1000;
 
 export const CACHE_TTL_DEFAULT = 300; // 5 minutes in seconds
 

@@ -40,11 +40,11 @@ const SubjectDetailPlaceholder = () => {
     if (loading) return <div className="text-textSecondary">Loading subject timeline...</div>;
     if (error) return <div className="text-red-500">{error}</div>;
 
-    const completedTopicsCount = topics.filter(t => t.completed).length;
+    const completedTopicsCount = topics.filter(t => t.is_completed).length;
     const progressPercentage = topics.length > 0 ? Math.round((completedTopicsCount / topics.length) * 100) : 0;
 
     return (
-        <div className="max-w-5xl mx-auto w-full pb-12">
+        <div className="max-w-5xl mx-auto w-full pb-12 animate-fade-in">
             {/* Header Area */}
             <button
                 onClick={() => navigate('/dashboard')}
@@ -68,7 +68,7 @@ const SubjectDetailPlaceholder = () => {
             </div>
 
             {/* Overall Progress Bar */}
-            <div className="w-full bg-[#161616] rounded-full h-3 mb-10 border border-border overflow-hidden">
+            <div className="w-full bg-[#161616] rounded-full h-3 mb-10 border border-border overflow-hidden animate-slide-up" style={{ animationDelay: '0.1s', animationFillMode: 'both' }}>
                 <div
                     className="bg-accent h-3 rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${progressPercentage}%` }}
@@ -77,7 +77,7 @@ const SubjectDetailPlaceholder = () => {
 
             {/* Topics List */}
             {topics.length === 0 ? (
-                <div className="text-center p-12 bg-surface border border-border rounded-xl">
+                <div className="text-center p-12 bg-surface border border-border rounded-xl animate-slide-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
                     <p className="text-textSecondary">No topics found for this subject.</p>
                 </div>
             ) : (
@@ -93,21 +93,23 @@ const SubjectDetailPlaceholder = () => {
                                         navigate(`/dashboard/subject/${subjectId}/topic/${topic._id}/lesson`);
                                     }}
                                     className={`
-                                        flex flex-col justify-between p-5 rounded-xl border transition-all duration-200 h-full
-                                        ${topic.completed
-                                            ? "bg-surface/50 border-border opacity-70"
-                                            : "bg-[#1E1E1E] border-accent/50 shadow-[0_0_15px_rgba(200,162,76,0.1)] cursor-pointer hover:border-accent hover:-translate-y-0.5"
+                                        animate-slide-up
+                                        flex flex-col justify-between p-5 rounded-xl border transition-all duration-300 h-full
+                                        ${topic.is_completed
+                                            ? "bg-surface/50 border-border opacity-70 hover:opacity-100"
+                                            : "bg-[#1E1E1E] border-accent/50 shadow-[0_0_15px_rgba(200,162,76,0.1)] cursor-pointer hover:border-accent hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(200,162,76,0.3)]"
                                         }
                                     `}
+                                    style={{ animationDelay: `${0.2 + (index * 0.1)}s`, animationFillMode: 'both' }}
                                 >
                                     <div className="flex items-start justify-between mb-4">
                                         <div className={`
                                             w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0
-                                            ${topic.completed ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-accent/20 text-accent"}
+                                            ${topic.is_completed ? "bg-green-500/10 text-green-500 border border-green-500/20" : "bg-accent/20 text-accent"}
                                         `}>
-                                            {topic.completed ? "✓" : (index + 1)}
+                                            {topic.is_completed ? "✓" : (index + 1)}
                                         </div>
-                                        {topic.completed && (
+                                        {topic.is_completed && (
                                             <span className="text-xs font-semibold text-green-500 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20">
                                                 Mastered
                                             </span>
@@ -115,7 +117,7 @@ const SubjectDetailPlaceholder = () => {
                                     </div>
 
                                     <div className="mb-6">
-                                        <h4 className={`text-lg font-semibold ${topic.completed ? "text-textSecondary" : "text-textPrimary"}`}>
+                                        <h4 className={`text-lg font-semibold ${topic.is_completed ? "text-textSecondary" : "text-textPrimary"}`}>
                                             {topic.topic_name}
                                         </h4>
                                         {topic.section_name && (
@@ -124,7 +126,7 @@ const SubjectDetailPlaceholder = () => {
                                     </div>
 
                                     <div className="mt-auto">
-                                        {!topic.completed ? (
+                                        {!topic.is_completed ? (
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation(); // prevent triggering parent div click
