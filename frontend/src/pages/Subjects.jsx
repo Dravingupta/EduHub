@@ -20,7 +20,7 @@ const Subjects = () => {
                 ]);
                 setSubjects(subjRes.data?.data?.subjects || []);
                 setUserContext(userRes.data?.data?.user || null);
-                setStreakData(streakRes.data?.data || null);
+                setStreakData(streakRes.data?.data?.analytics || null);
             } catch (err) {
                 setError("Failed to fetch dashboard data.");
                 console.error(err);
