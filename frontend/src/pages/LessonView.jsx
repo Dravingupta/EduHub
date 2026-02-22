@@ -49,6 +49,12 @@ const MermaidDiagram = ({ chart }) => {
 
             const id = `mermaid-${Math.random().toString(36).substring(2, 10)}`;
             const { svg } = await mermaid.render(id, cleanChart);
+
+            // Mermaid v11+ sometimes catches its own errors and returns them as a rendered SVG.
+            if (svg.includes("Syntax error") || svg.includes("syntax error")) {
+                throw new Error("Mermaid internal parsing error embedded in SVG");
+            }
+
             containerRef.current.innerHTML = svg;
             setError(false);
         } catch (err) {
