@@ -126,17 +126,33 @@ const Subjects = () => {
                         >
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
                                 <h3 style={{ margin: 0, fontSize: "1.25rem", color: "#F5F5F5" }}>{subject.subject_name}</h3>
-                                <span style={{
-                                    fontSize: "0.75rem",
-                                    padding: "0.2rem 0.5rem",
-                                    background: subject.type === "universal" ? "#2D3748" : "#2C5282",
-                                    borderRadius: "12px",
-                                    color: "#E2E8F0",
-                                    textTransform: "uppercase",
-                                    fontWeight: "bold"
-                                }}>
-                                    {subject.type}
-                                </span>
+                                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                                    {subject.is_completed && (
+                                        <span style={{
+                                            fontSize: "0.75rem",
+                                            padding: "0.2rem 0.5rem",
+                                            background: "rgba(72, 187, 120, 0.2)",
+                                            border: "1px solid rgba(72, 187, 120, 0.5)",
+                                            borderRadius: "4px",
+                                            color: "#48BB78",
+                                            textTransform: "uppercase",
+                                            fontWeight: "bold"
+                                        }}>
+                                            Completed
+                                        </span>
+                                    )}
+                                    <span style={{
+                                        fontSize: "0.75rem",
+                                        padding: "0.2rem 0.5rem",
+                                        background: subject.type === "universal" ? "#2D3748" : "#2C5282",
+                                        borderRadius: "12px",
+                                        color: "#E2E8F0",
+                                        textTransform: "uppercase",
+                                        fontWeight: "bold"
+                                    }}>
+                                        {subject.type}
+                                    </span>
+                                </div>
                             </div>
 
                             <div style={{ marginTop: "1.5rem", fontSize: "0.875rem", color: "#A1A1AA" }}>

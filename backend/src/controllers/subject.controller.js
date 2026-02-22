@@ -63,8 +63,18 @@ export const getSubjects = async (req, res, next) => {
         const { uid } = req.user;
         const user = await userService.getOrCreateUser(uid);
         const subjects = await subjectService.getUserSubjects(user._id);
+        const subjectsWithTopics = await Promise.all(subjects.map(async (subj) => {
+            const topics = await topicService.getSubjectTopics(subj._id);
+            const totalTopics = topics.length;
+            const completedTopics = topics.filter(t => t.is_completed).length;
 
-        return successResponse(res, { subjects }, 'Subjects fetched successfully');
+            return {
+                ...subj.toObject(),
+                is_completed: totalTopics > 0 && totalTopics === completedTopics
+            };
+        }));
+
+        return successResponse(res, { subjects: subjectsWithTopics }, 'Subjects fetched successfully');
     } catch (error) {
         next(error);
     }
