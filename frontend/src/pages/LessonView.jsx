@@ -63,12 +63,10 @@ const MermaidDiagram = ({ chart }) => {
 
     if (error) {
         return (
-            <div className="bg-[#1A1A2E] border border-[#333] rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2 text-amber-400 text-xs font-semibold">
-                    <span>⚠️</span>
-                    <span>Diagram couldn't render — showing raw syntax</span>
-                </div>
-                <pre className="text-xs text-textSecondary overflow-x-auto whitespace-pre-wrap">{rawSyntax}</pre>
+            <div className="bg-[#131313] border border-[#262626] rounded-xl p-5 overflow-x-auto my-2">
+                <pre className="text-[13px] text-[#A1A1AA] whitespace-pre-wrap font-mono leading-[1.6] select-text">
+                    {rawSyntax}
+                </pre>
             </div>
         );
     }
