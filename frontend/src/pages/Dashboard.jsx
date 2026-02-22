@@ -5,62 +5,49 @@ const Dashboard = () => {
     const { currentUser, logout } = useAuth();
     const location = useLocation();
 
-    const navLinkStyle = (path) => ({
-        display: "block",
-        padding: "0.75rem 1rem",
-        marginBottom: "0.5rem",
-        color: location.pathname === path ? "#C8A24C" : "#A1A1AA",
-        background: location.pathname === path ? "#1E1E1E" : "transparent",
-        borderRadius: "4px",
-        textDecoration: "none",
-        fontWeight: location.pathname === path ? "bold" : "normal",
-        transition: "all 0.2s ease"
-    });
-
     return (
-        <div style={{ display: "flex", minHeight: "100vh", background: "#0E0E0E", color: "#F5F5F5" }}>
-            {/* Sidebar */}
-            <aside style={{ width: "250px", borderRight: "1px solid #262626", padding: "1.5rem", display: "flex", flexDirection: "column" }}>
-                <h3 style={{ marginBottom: "2rem", color: "#F5F5F5", fontSize: "1.25rem" }}>EduHub</h3>
+        <div className="flex flex-col md:flex-row min-h-screen bg-[#0E0E0E] text-[#F5F5F5]">
+            {/* Sidebar / Top Nav */}
+            <aside className="w-full md:w-[250px] border-b md:border-b-0 md:border-r border-[#262626] p-4 md:p-6 flex flex-col md:min-h-screen md:sticky md:top-0 bg-[#0E0E0E] z-10 shrink-0">
+                <h3 className="mb-4 md:mb-8 text-[#F5F5F5] text-xl font-bold">EduHub</h3>
 
-                <nav style={{ flex: 1 }}>
-                    <Link to="/dashboard" style={navLinkStyle("/dashboard")}>
+                <nav className="flex md:flex-col overflow-x-auto gap-2 pb-2 md:pb-0 scrollbar-hide">
+                    <Link
+                        to="/dashboard"
+                        className={`block px-4 py-3 rounded flex-shrink-0 transition-colors ${location.pathname === "/dashboard"
+                                ? "text-[#C8A24C] bg-[#1E1E1E] font-bold"
+                                : "text-[#A1A1AA] hover:bg-[#161616]"
+                            }`}
+                    >
                         Subjects
                     </Link>
-                    <Link to="/dashboard/analytics" style={navLinkStyle("/dashboard/analytics")}>
-                        Data Analytics
-                    </Link>
-                    <Link to="#" style={{ ...navLinkStyle("#"), opacity: 0.5, cursor: "not-allowed" }}>
-                        Settings (Coming Soon)
+                    <Link
+                        to="/dashboard/analytics"
+                        className={`block px-4 py-3 rounded flex-shrink-0 transition-colors ${location.pathname === "/dashboard/analytics"
+                                ? "text-[#C8A24C] bg-[#1E1E1E] font-bold"
+                                : "text-[#A1A1AA] hover:bg-[#161616]"
+                            }`}
+                    >
+                        Progress Tracker
                     </Link>
                 </nav>
             </aside>
 
             {/* Main Content Area */}
-            <main style={{ flex: 1, display: "flex", flexDirection: "column", padding: "2rem" }}>
+            <main className="flex-1 flex flex-col p-4 md:p-8 w-full max-w-full overflow-hidden">
                 {/* Top bar */}
-                <header style={{ width: "100%", display: "flex", justifyItems: "center", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #262626", paddingBottom: "1.5rem", marginBottom: "2rem" }}>
-                    <h2 style={{ fontSize: "1.25rem", margin: 0, fontWeight: "500" }}>Welcome, {currentUser?.displayName || "User"}</h2>
+                <header className="w-full flex justify-between items-center border-b border-[#262626] pb-4 md:pb-6 mb-6">
+                    <h2 className="text-lg md:text-xl font-medium m-0 truncate pr-4">Welcome, {currentUser?.displayName || "User"}</h2>
                     <button
                         onClick={logout}
-                        style={{
-                            padding: "0.5rem 1rem",
-                            cursor: "pointer",
-                            background: "#161616",
-                            color: "#F5F5F5",
-                            border: "1px solid #262626",
-                            borderRadius: "4px",
-                            transition: "background 0.2s ease"
-                        }}
-                        onMouseEnter={(e) => e.target.style.background = "#262626"}
-                        onMouseLeave={(e) => e.target.style.background = "#161616"}
+                        className="px-4 py-2 bg-[#161616] text-[#F5F5F5] border border-[#262626] rounded hover:bg-[#262626] transition-colors shrink-0 text-sm cursor-pointer"
                     >
                         Logout
                     </button>
                 </header>
 
                 {/* Dynamic Nested Route Content */}
-                <div style={{ flex: 1 }}>
+                <div className="flex-1 w-full max-w-full">
                     <Outlet />
                 </div>
             </main>
