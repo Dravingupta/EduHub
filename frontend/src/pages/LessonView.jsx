@@ -601,14 +601,19 @@ const LessonView = () => {
     }, [currentVisibleIndex]);
 
     const handleNextBlock = () => {
-        if (lessonData && currentVisibleIndex < lessonData.blocks.length - 1) {
+        const otherBlocks = lessonData?.blocks?.filter(b => b.type !== 'youtube') || [];
+        if (lessonData && currentVisibleIndex < otherBlocks.length - 1) {
             setCurrentVisibleIndex((prev) => prev + 1);
         } else {
             navigate(`/dashboard/subject/${subjectId}/topic/${topicId}/assignment`);
         }
     };
 
-    const totalBlocks = lessonData?.blocks?.length || 0;
+    const hasData = lessonData && lessonData.blocks;
+    const youtubeBlock = hasData ? lessonData.blocks.find(b => b.type === 'youtube') : null;
+    const otherBlocks = hasData ? lessonData.blocks.filter(b => b.type !== 'youtube') : [];
+
+    const totalBlocks = otherBlocks.length;
     const progress = totalBlocks > 0 ? ((currentVisibleIndex + 1) / totalBlocks) * 100 : 0;
 
     const renderBlock = (block, index) => {
@@ -684,6 +689,44 @@ const LessonView = () => {
                         </div>
                     );
 
+                case "youtube":
+                    // Fallback if the search failed and we populated content with raw text
+                    if (typeof block.content === 'string' && block.content.includes(' ')) {
+                        return (
+                            <div className={`lesson-block relative bg-[#141414] border border-red-500/20 rounded-2xl overflow-hidden ${isLatest ? "lesson-block-enter" : ""}`}>
+                                <div className="p-6 md:p-8">
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center text-lg text-red-500">📺</div>
+                                        <h3 className="text-xl font-bold text-[#F5F5F5] tracking-tight">{block.title}</h3>
+                                    </div>
+                                    <p className="text-[#A1A1AA]"><RenderFormattedText text={block.content} /></p>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div className={`lesson-block relative rounded-2xl overflow-hidden bg-[#0A0A0A] border border-[#222] ${isLatest ? "lesson-block-enter" : ""}`}>
+                            <div className="h-1 bg-gradient-to-r from-red-600 via-red-500 to-transparent" />
+                            <div className="p-4 md:p-6 border-b border-[#222]">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-red-600/10 flex items-center justify-center text-lg">📺</div>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">{block.title}</h3>
+                                </div>
+                            </div>
+                            <div className="aspect-video w-full">
+                                <iframe
+                                    className="w-full h-full"
+                                    src={`https://www.youtube.com/embed/${block.content}`}
+                                    title="YouTube video player"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                        </div>
+                    );
+
                 case "diagram":
                     return (
                         <div className={`lesson-block relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#131320] to-[#141418] border border-indigo-500/15 ${isLatest ? "lesson-block-enter" : ""}`}>
@@ -733,23 +776,10 @@ const LessonView = () => {
         );
     };
 
-    /* ─── Loading State ─── */
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-                <div className="relative w-12 h-12">
-                    <div className="absolute inset-0 rounded-full border-2 border-accent/20" />
-                    <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-accent animate-spin" />
-                </div>
-                <p className="text-textSecondary text-sm animate-pulse">Generating interactive lesson…</p>
-            </div>
-        );
-    }
-
     /* ─── Error State ─── */
     if (error) {
         return (
-            <div className="max-w-3xl mx-auto mt-16">
+            <div className="max-w-3xl mx-auto mt-16 px-4">
                 <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-8 text-center">
                     <div className="text-3xl mb-4">😔</div>
                     <p className="text-red-400 mb-5">{error}</p>
@@ -794,10 +824,27 @@ const LessonView = () => {
                 </div>
             </div>
 
-            {/* ─── Lesson Blocks with inline controls ─── */}
-            <div>
-                {lessonData.blocks.map((block, index) => renderBlock(block, index))}
-            </div>
+            {/* ─── Static YouTube Block (Always Visible) ─── */}
+            {youtubeBlock && (
+                <div className="mb-6">
+                    {renderBlock(youtubeBlock, 0, true)}
+                </div>
+            )}
+
+            {/* ─── Dynamic Loading or Lesson Blocks ─── */}
+            {loading ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                    <div className="relative w-10 h-10">
+                        <div className="absolute inset-0 rounded-full border-2 border-accent/20" />
+                        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-accent animate-spin" />
+                    </div>
+                    <p className="text-textSecondary text-sm animate-pulse">Generating intense concepts…</p>
+                </div>
+            ) : (
+                <div>
+                    {otherBlocks.map((block, index) => renderBlock(block, index, false))}
+                </div>
+            )}
 
             {/* Floating AI Tutor Chat */}
             <LessonChat
