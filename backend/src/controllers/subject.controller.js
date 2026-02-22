@@ -116,6 +116,10 @@ export const updateDensity = async (req, res, next) => {
 
         const subject = await subjectService.updateDensityPreference(id, density);
 
+        // Recalculate global density based on the updated subjects
+        const user = await userService.getOrCreateUser(req.user.uid);
+        await userService.recalculateGlobalDensity(user._id, req.user.uid);
+
         return successResponse(res, { subject }, 'Density preference updated successfully');
     } catch (error) {
         next(error);
