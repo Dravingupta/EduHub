@@ -99,6 +99,8 @@ Each block object must strictly contain:
 - "content": (string, object, or array depending on what best represents the block)
 - "metadata": (optional object for extra contextual data)
 
+CRITICAL JSON ESCAPING: Because your output is a JSON string, you MUST double-escape all LaTeX backslashes. For example, write \\\\frac instead of \\frac, and \\\\bar instead of \\bar.
+
 For "diagram" type blocks: the "content" field MUST contain ONLY valid Mermaid.js syntax. STRICT RULES:
   * Use ONLY "graph TD" or "graph LR" (do NOT use "flowchart" or "mindmap" or "sequenceDiagram").
   * Use simple single-word node IDs (A, B, C) with labels in square brackets: A["Label text"]

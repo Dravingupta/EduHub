@@ -286,11 +286,11 @@ const AnalyticsOverview = () => {
                 </div>
 
                 <div style={{ background: "linear-gradient(145deg, #1A1A1A 0%, #0E0E0E 100%)", border: "1px solid #262626", borderRadius: "12px", padding: "1.5rem" }}>
-                    <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>AI Tunes Used</span>
+                    <span style={{ color: "#A1A1AA", fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "1px" }}>Adaptive Swaps Used</span>
                     <div style={{ fontSize: "2.5rem", fontWeight: "bold", color: "#F5F5F5", marginTop: "0.5rem" }}>
                         {stats?.total_swap_usage || 0}
                     </div>
-                    <div style={{ color: "#A1A1AA", fontSize: "0.875rem", marginTop: "0.25rem" }}>Adaptive lesson rebuilds</div>
+                    <div style={{ color: "#A1A1AA", fontSize: "0.875rem", marginTop: "0.25rem" }}>Tuning Dial regenerations</div>
                 </div>
             </div>
 

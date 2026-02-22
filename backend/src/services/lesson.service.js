@@ -83,6 +83,8 @@ Follow this strict schema:
   ]
 }
 
+CRITICAL JSON ESCAPING: Because your output is a JSON string, you MUST double-escape all LaTeX backslashes. For example, write \\\\frac instead of \\frac, and \\\\bar instead of \\bar.
+
 BLOCK TYPE RULES:
 - "concept": Standard explanation cards. Use proper Markdown and LaTeX ($ inline $, $$ block $$) for math formulas or matrices. Do NOT use Mermaid here.
 - "example": Concrete analogies, code snippets, or mathematical step-by-step applications. Use LaTeX for math.
@@ -101,6 +103,11 @@ Ensure the "blocks" array logically flows progressively. Keep it engaging. You M
 
     // 5. Call LLM
     console.log(`[LessonService] Generating new lesson for Topic: ${topic.topic_name} | Density: ${density} | Difficulty: ${difficulty}`);
+
+    if (forceRegenerate) {
+        console.log(`[LessonService] Tracking Adaptive Swap metric for Subject: ${subject._id}`);
+        await subjectRepository.incrementSwap(subject._id);
+    }
 
     const generatedLessonData = await geminiService.generateLesson(prompt);
 

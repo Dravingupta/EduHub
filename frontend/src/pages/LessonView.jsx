@@ -85,57 +85,65 @@ const MermaidDiagram = ({ chart }) => {
     );
 };
 
+/* ─── Markdown Inline Formatter ─── */
+const RenderFormattedText = ({ text }) => {
+    if (!text) return null;
+
+    // Split by ** for bold text
+    const parts = text.split(/\*\*(.*?)\*\*/g);
+    return (
+        <>
+            {parts.map((part, i) => {
+                if (i % 2 === 1) {
+                    return <strong key={i} className="font-bold text-[#E2E8F0]">{part}</strong>;
+                }
+                // Handle single * for italics
+                const italicParts = part.split(/\*(.*?)\*/g);
+                return (
+                    <span key={i}>
+                        {italicParts.map((subPart, j) => {
+                            if (j % 2 === 1) return <em key={j} className="italic text-[#D4D4D8]">{subPart}</em>;
+                            return <span key={j}>{subPart}</span>;
+                        })}
+                    </span>
+                );
+            })}
+        </>
+    );
+};
+
 /* ─── LaTeX-aware text renderer ─── */
 const RenderMath = ({ text }) => {
     if (!text) return null;
 
-    const parts = [];
-    let remaining = text;
-    let key = 0;
+    const regex = /(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g;
+    const segments = text.split(regex);
 
-    while (remaining.length > 0) {
-        const blockMatch = remaining.match(/\$\$([^$]+)\$\$/);
-        const inlineMatch = remaining.match(/\$([^$]+)\$/);
-
-        const firstMatch =
-            blockMatch && inlineMatch
-                ? remaining.indexOf(blockMatch[0]) <= remaining.indexOf(inlineMatch[0])
-                    ? { type: "block", match: blockMatch }
-                    : { type: "inline", match: inlineMatch }
-                : blockMatch
-                    ? { type: "block", match: blockMatch }
-                    : inlineMatch
-                        ? { type: "inline", match: inlineMatch }
-                        : null;
-
-        if (!firstMatch) {
-            parts.push(<span key={key++}>{remaining}</span>);
-            break;
-        }
-
-        const idx = remaining.indexOf(firstMatch.match[0]);
-        if (idx > 0) {
-            parts.push(<span key={key++}>{remaining.substring(0, idx)}</span>);
-        }
-
-        try {
-            if (firstMatch.type === "block") {
-                parts.push(
-                    <div key={key++} className="my-4 flex justify-center">
-                        <BlockMath math={firstMatch.match[1].trim()} />
-                    </div>
-                );
-            } else {
-                parts.push(<InlineMath key={key++} math={firstMatch.match[1].trim()} />);
-            }
-        } catch {
-            parts.push(<code key={key++} className="text-accent">{firstMatch.match[0]}</code>);
-        }
-
-        remaining = remaining.substring(idx + firstMatch.match[0].length);
-    }
-
-    return <>{parts}</>;
+    return (
+        <>
+            {segments.map((segment, i) => {
+                try {
+                    if (segment.startsWith("$$") && segment.endsWith("$$")) {
+                        return (
+                            <div key={i} className="my-4 flex justify-center">
+                                <BlockMath math={segment.slice(2, -2).trim()} />
+                            </div>
+                        );
+                    }
+                    if (segment.startsWith("$") && segment.endsWith("$")) {
+                        return <InlineMath key={i} math={segment.slice(1, -1).trim()} />;
+                    }
+                    if (segment.trim().length > 0) {
+                        return <RenderFormattedText key={i} text={segment} />;
+                    }
+                } catch (err) {
+                    console.warn("KaTeX Error:", err);
+                    return <span key={i} className="text-red-400 font-mono">{segment}</span>;
+                }
+                return null;
+            })}
+        </>
+    );
 };
 
 /* ─── Bullet / numbered list parser ─── */

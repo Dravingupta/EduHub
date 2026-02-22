@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
@@ -25,6 +25,15 @@ const Login = () => {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center px-4 relative overflow-hidden bg-[#0A0A0A]">
+
+            {/* Back Button */}
+            <Link
+                to="/"
+                className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2 text-[#A1A1AA] hover:text-[#F5F5F5] transition-colors z-20 text-sm font-medium group"
+            >
+                <span className="group-hover:-translate-x-1 transition-transform">←</span> Return to Home
+            </Link>
+
             {/* Background ambient glow */}
             <div className="absolute top-[-20%] left-[15%] w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-15%] right-[10%] w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />

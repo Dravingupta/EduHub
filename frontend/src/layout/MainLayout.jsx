@@ -1,6 +1,21 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const MainLayout = ({ children }) => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleFeaturesClick = (e) => {
+        e.preventDefault();
+        if (location.pathname !== '/') {
+            navigate('/');
+            setTimeout(() => {
+                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        } else {
+            document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-background text-textPrimary relative overflow-hidden">
 
@@ -19,13 +34,16 @@ const MainLayout = ({ children }) => {
             </div>
 
             <nav className="relative z-50 h-[80px] border-b border-white/5 flex items-center justify-between px-8 bg-background/50 backdrop-blur-xl">
-                <div className="text-xl font-bold tracking-tight">
-                    Obsidian Learn
-                </div>
-                <div className="flex gap-8 text-sm font-medium">
-                    <Link to="/" className="hover:text-textPrimary text-textSecondary transition-colors hover:cursor-pointer">Product</Link>
-                    <Link to="/" className="hover:text-textPrimary text-textSecondary transition-colors hover:cursor-pointer">Demo</Link>
-                    <Link to="/login" className="hover:opacity-80 transition-opacity hover:cursor-pointer text-accent">Sign In</Link>
+                <Link to="/" className="text-xl font-bold tracking-tight inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#C8A24C] to-amber-500 flex items-center justify-center text-black font-black text-sm shadow-md">
+                        E
+                    </div>
+                    EduHub
+                </Link>
+                <div className="flex items-center gap-8 text-sm font-medium">
+                    <a href="#features" onClick={handleFeaturesClick} className="hover:text-textPrimary text-textSecondary transition-colors hover:cursor-pointer hidden sm:block">Features</a>
+                    <Link to="/dashboard" className="hover:text-textPrimary text-textSecondary transition-colors hover:cursor-pointer hidden sm:block">Dashboard</Link>
+                    <Link to="/login" className="bg-[#C8A24C] text-black font-bold rounded-lg px-5 py-2 hover:bg-[#D4AF57] transition-all hover:scale-105 shadow-[0_0_15px_rgba(200,162,76,0.2)] flex items-center justify-center">Sign In</Link>
                 </div>
             </nav>
 
@@ -34,7 +52,7 @@ const MainLayout = ({ children }) => {
             </main>
 
             <footer className="relative z-10 py-8 border-t border-white/5 flex items-center justify-center bg-background/50 backdrop-blur-xl">
-                <p className="text-textSecondary text-xs">© 2026 Obsidian Learn. All rights reserved.</p>
+                <p className="text-textSecondary text-xs">© 2026 EduHub. All rights reserved.</p>
             </footer>
         </div>
     );
